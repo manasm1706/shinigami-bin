@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 import Sidebar from './components/Sidebar/Sidebar';
 import ChatWindow from './components/ChatWindow/ChatWindow';
 import MessageInput from './components/MessageInput/MessageInput';
-import { Realm, Message } from './types';
+import { Realm } from './types';
+import { getMessages, sendMessage } from './services/messages';
+import type { MessageResponse } from './services/messages';
 
 // Initial realms data
 const initialRealms: Realm[] = [
@@ -27,34 +29,48 @@ const initialRealms: Realm[] = [
 function App() {
   const [realms] = useState<Realm[]>(initialRealms);
   const [activeRealmId, setActiveRealmId] = useState<string>('living');
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      realmId: 'living',
-      author: 'SYSTEM',
-      content: 'Welcome to the Living realm. Your journey begins here...',
-      timestamp: new Date(),
-      type: 'system'
-    }
-  ]);
+  const [messages, setMessages] = useState<MessageResponse[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
   const activeRealm = realms.find(r => r.id === activeRealmId) || null;
-  const realmMessages = messages.filter(m => m.realmId === activeRealmId);
+
+  // Fetch messages when realm changes
+  useEffect(() => {
+    const fetchMessages = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const fetchedMessages = await getMessages(activeRealmId);
+        setMessages(fetchedMessages);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load messages');
+        console.error('Failed to fetch messages:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMessages();
+  }, [activeRealmId]);
 
   const handleRealmSelect = (realmId: string) => {
     setActiveRealmId(realmId);
   };
 
-  const handleSendMessage = (content: string) => {
-    const newMessage: Message = {
-      id: Date.now().toString(),
-      realmId: activeRealmId,
-      author: 'User',
-      content,
-      timestamp: new Date(),
-      type: 'user'
-    };
-    setMessages([...messages, newMessage]);
+  const handleSendMessage = async (content: string) => {
+    setError(null);
+    try {
+      const newMessage = await sendMessage({
+        sender: 'User',
+        text: content,
+        realm: activeRealmId
+      });
+      setMessages([...messages, newMessage]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to send message');
+      console.error('Failed to send message:', err);
+    }
   };
 
   return (
@@ -66,12 +82,14 @@ function App() {
       />
       <main className="main-content">
         <ChatWindow 
-          messages={realmMessages}
+          messages={messages}
           activeRealm={activeRealm}
+          loading={loading}
+          error={error}
         />
         <MessageInput 
           onSendMessage={handleSendMessage}
-          disabled={!activeRealmId}
+          disabled={!activeRealmId || loading}
         />
       </main>
     </div>

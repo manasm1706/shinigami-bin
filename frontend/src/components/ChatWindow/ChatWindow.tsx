@@ -1,24 +1,33 @@
 import React, { useEffect, useRef } from 'react';
 import './ChatWindow.css';
-import { Message, Realm } from '../../types';
+import { Realm } from '../../types';
+import type { MessageResponse } from '../../services/messages';
 
 interface ChatWindowProps {
-  messages: Message[];
+  messages: MessageResponse[];
   activeRealm: Realm | null;
+  loading?: boolean;
+  error?: string | null;
 }
 
-const ChatWindow: React.FC<ChatWindowProps> = ({ messages, activeRealm }) => {
+const ChatWindow: React.FC<ChatWindowProps> = ({ messages, activeRealm, loading = false, error = null }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const formatTime = (date: Date) => {
-    return new Date(date).toLocaleTimeString('en-US', { 
+  const formatTime = (timestamp: string) => {
+    return new Date(timestamp).toLocaleTimeString('en-US', { 
       hour: '2-digit', 
       minute: '2-digit' 
     });
+  };
+
+  const getMessageType = (sender: string): 'user' | 'system' | 'fortune' => {
+    if (sender === 'SYSTEM') return 'system';
+    if (sender === 'FORTUNE') return 'fortune';
+    return 'user';
   };
 
   return (
@@ -34,7 +43,21 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ messages, activeRealm }) => {
       </div>
 
       <div className="messages-container">
-        {messages.length === 0 ? (
+        {error && (
+          <div className="error-banner">
+            <span className="error-icon">⚠</span>
+            <span className="error-text">{error}</span>
+          </div>
+        )}
+
+        {loading ? (
+          <div className="loading-state">
+            <div className="loading-spinner">
+              ◆ ◇ ◆ ◇ ◆
+            </div>
+            <p>Loading messages from the {activeRealm?.name} realm...</p>
+          </div>
+        ) : messages.length === 0 ? (
           <div className="empty-state">
             <div className="ascii-art">
               ╔═══════════════════════════╗<br/>
@@ -47,13 +70,13 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ messages, activeRealm }) => {
           messages.map((message) => (
             <div 
               key={message.id} 
-              className={`message message-${message.type || 'user'}`}
+              className={`message message-${getMessageType(message.sender)}`}
             >
               <div className="message-header">
-                <span className="message-author">{message.author}</span>
+                <span className="message-author">{message.sender}</span>
                 <span className="message-time">{formatTime(message.timestamp)}</span>
               </div>
-              <div className="message-content">{message.content}</div>
+              <div className="message-content">{message.text}</div>
             </div>
           ))
         )}

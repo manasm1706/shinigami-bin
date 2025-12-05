@@ -2,17 +2,25 @@ import React, { useState, KeyboardEvent } from 'react';
 import './MessageInput.css';
 
 interface MessageInputProps {
-  onSendMessage: (content: string) => void;
+  onSendMessage: (content: string) => Promise<void>;
   disabled?: boolean;
 }
 
 const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage, disabled = false }) => {
   const [message, setMessage] = useState('');
+  const [sending, setSending] = useState(false);
 
-  const handleSend = () => {
-    if (message.trim() && !disabled) {
-      onSendMessage(message.trim());
-      setMessage('');
+  const handleSend = async () => {
+    if (message.trim() && !disabled && !sending) {
+      setSending(true);
+      try {
+        await onSendMessage(message.trim());
+        setMessage('');
+      } catch (error) {
+        console.error('Failed to send message:', error);
+      } finally {
+        setSending(false);
+      }
     }
   };
 
@@ -34,14 +42,14 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage, disabled = f
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyPress={handleKeyPress}
-          disabled={disabled}
+          disabled={disabled || sending}
         />
         <button 
           className="send-button" 
           onClick={handleSend}
-          disabled={disabled || !message.trim()}
+          disabled={disabled || !message.trim() || sending}
         >
-          SEND ▶
+          {sending ? 'SENDING...' : 'SEND ▶'}
         </button>
       </div>
     </div>
