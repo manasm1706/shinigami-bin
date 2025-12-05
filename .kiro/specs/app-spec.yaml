@@ -2,18 +2,74 @@ name: Shinigami-bin
 description: >
   A messaging and fortune-telling platform themed around shinigami,
   with group chats, daily predictions, weather omens and minigames.
+
 modules:
   - name: messaging
     description: Core chat and group chat functionality
+    status: implemented
+    components:
+      - Sidebar (realm selector)
+      - ChatWindow (message display)
+      - MessageInput (send messages)
+    api:
+      - GET /api/messages?realm={realm}
+      - POST /api/messages
+      - GET /api/messages/all
+    features:
+      - In-memory message storage
+      - Realm-based message filtering
+      - Real-time message display
+      - Message validation (sender, text, realm)
+
   - name: fortunes
     description: Daily fortune + death-tinged predictions
+    status: implemented
+    components:
+      - FortuneCard (display daily fortune)
+    api:
+      - endpoint: GET /api/fortune/daily?username={username}
+        description: Fetch personalized daily fortune
+        request:
+          query_params:
+            username: string (required, 1-50 chars)
+        response:
+          username: string
+          fortune: string
+          severity: enum [low, medium, high]
+          timestamp: ISO 8601 datetime
+    features:
+      - Random fortune generation (25 unique templates)
+      - Severity levels with color coding
+        - low: grey (WHISPER)
+        - medium: orange (WARNING)
+        - high: red (OMEN)
+      - Auto-fetch on page load
+      - Manual re-fetch via button
+      - Spooky glitch loading animation
+      - Fade-in transition effects
+    future_plans:
+      - fortune_streaks: Track consecutive days of fortune checking
+      - severity_effects: Apply visual/gameplay effects based on severity
+        - low: subtle UI changes
+        - medium: moderate atmospheric effects
+        - high: dramatic visual warnings, special events
+      - fortune_history: Store and display past fortunes
+      - fortune_sharing: Share fortunes in chat realms
+
   - name: weather_omens
     description: Weather API integration with spooky omen text
+    status: planned
+
   - name: calendar_prophecies
     description: Event reminders described as prophecies
+    status: planned
+
   - name: minigames
     description: Small games inside chat to pass time
+    status: planned
+
 tech_stack:
-  frontend: React (Vite)
+  frontend: React (Vite) + TypeScript
   backend: Node.js + Express
   database: optional (start with in-memory)
+  styling: CSS (retro CRT/ASCII theme)
