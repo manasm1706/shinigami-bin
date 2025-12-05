@@ -1,0 +1,19 @@
+name: Shinigami-bin
+description: >
+  A messaging and fortune-telling platform themed around shinigami,
+  with group chats, daily predictions, weather omens and minigames.
+modules:
+  - name: messaging
+    description: Core chat and group chat functionality
+  - name: fortunes
+    description: Daily fortune + death-tinged predictions
+  - name: weather_omens
+    description: Weather API integration with spooky omen text
+  - name: calendar_prophecies
+    description: Event reminders described as prophecies
+  - name: minigames
+    description: Small games inside chat to pass time
+tech_stack:
+  frontend: React (Vite)
+  backend: Node.js + Express
+  database: optional (start with in-memory)
