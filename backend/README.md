@@ -77,6 +77,29 @@ Response:
 GET /api/messages/all
 ```
 
+### Get Daily Fortune
+```
+GET /api/fortune/daily?username=YourName
+```
+
+Query Parameters:
+- `username` (required): Username to generate fortune for (1-50 characters)
+
+Response:
+```json
+{
+  "username": "YourName",
+  "fortune": "Your soul dances between worlds",
+  "severity": "medium",
+  "timestamp": "2025-12-05T10:30:00.000Z"
+}
+```
+
+Severity Levels:
+- `low`: Mild, mysterious fortunes
+- `medium`: Moderate, intriguing predictions
+- `high`: Intense, ominous warnings
+
 ## Validation Rules
 
 - **sender**: Required, string, 1-50 characters
@@ -89,10 +112,12 @@ GET /api/messages/all
 backend/
 ├── index.js              # Main server file
 ├── routes/
-│   └── messages.js       # Message routes
+│   ├── messages.js       # Message routes
+│   └── fortune.js        # Fortune routes
 ├── data/
 │   └── store.js          # In-memory data store
 ├── utils/
-│   └── validation.js     # Validation utilities
+│   ├── validation.js     # Validation utilities
+│   └── fortunes.js       # Fortune text generator
 └── package.json
 ```

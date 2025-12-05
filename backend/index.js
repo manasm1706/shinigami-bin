@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const messagesRouter = require('./routes/messages');
+const fortuneRouter = require('./routes/fortune');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -11,6 +12,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/messages', messagesRouter);
+app.use('/api/fortune', fortuneRouter);
 
 // Health check
 app.get('/api/health', (req, res) => {
