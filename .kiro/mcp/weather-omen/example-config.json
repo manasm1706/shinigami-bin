@@ -1,0 +1,17 @@
+{
+  "description": "Example MCP configuration for Kiro settings",
+  "note": "Add this to your .kiro/settings/mcp.json file",
+  "config": {
+    "mcpServers": {
+      "weather-omen": {
+        "command": "node",
+        "args": [".kiro/mcp/weather-omen/index.js"],
+        "env": {
+          "OPENWEATHER_API_KEY": "your_api_key_here_or_leave_empty_for_mock"
+        },
+        "disabled": false,
+        "autoApprove": ["get_weather_omen"]
+      }
+    }
+  }
+}
