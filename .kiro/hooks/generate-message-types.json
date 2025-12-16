@@ -1,0 +1,13 @@
+{
+  "name": "generate-message-types",
+  "description": "Auto-generate TypeScript types from app-spec.yaml when it updates",
+  "enabled": true,
+  "trigger": {
+    "type": "file-save",
+    "filePattern": ".kiro/specs/app-spec.yaml"
+  },
+  "action": {
+    "type": "agent-message",
+    "message": "The app-spec.yaml file has been updated. Please regenerate the TypeScript types file at frontend/src/types/generated.ts based on the API contracts defined in the spec. Include types for Message, Fortune, and any other API response/request types defined in the modules section."
+  }
+}

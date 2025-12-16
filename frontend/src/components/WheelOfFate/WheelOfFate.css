@@ -1,0 +1,462 @@
+.wheel-of-fate {
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a0a1a 100%);
+  border: 3px solid #ff6b35;
+  border-radius: 8px;
+  padding: 30px;
+  margin: 20px;
+  font-family: 'Courier New', monospace;
+  box-shadow: 
+    0 0 30px rgba(255, 107, 53, 0.4),
+    inset 0 0 50px rgba(255, 107, 53, 0.1);
+  position: relative;
+  overflow: hidden;
+  max-width: 600px;
+  text-align: center;
+}
+
+.wheel-of-fate::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 107, 53, 0.2),
+    transparent
+  );
+  animation: mystical-shimmer 4s infinite;
+}
+
+@keyframes mystical-shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* Header */
+.wheel-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 40px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #ff6b35;
+}
+
+.wheel-icon {
+  font-size: 32px;
+  color: #ff6b35;
+  text-shadow: 0 0 20px #ff6b35;
+  animation: fate-pulse 2s ease-in-out infinite;
+}
+
+@keyframes fate-pulse {
+  0%, 100% { 
+    opacity: 1;
+    text-shadow: 0 0 20px #ff6b35;
+  }
+  50% { 
+    opacity: 0.7;
+    text-shadow: 0 0 30px #ff6b35, 0 0 40px #ff6b35;
+  }
+}
+
+.wheel-title {
+  font-size: 28px;
+  color: #ff6b35;
+  margin: 0;
+  letter-spacing: 4px;
+  text-shadow: 0 0 15px #ff6b35;
+}
+
+/* Wheel Container */
+.wheel-container {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  margin: 0 auto 40px;
+}
+
+.wheel-pointer {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 30px;
+  color: #ff6b35;
+  text-shadow: 0 0 15px #ff6b35;
+  z-index: 10;
+  animation: pointer-glow 1.5s ease-in-out infinite;
+}
+
+@keyframes pointer-glow {
+  0%, 100% { 
+    text-shadow: 0 0 15px #ff6b35;
+  }
+  50% { 
+    text-shadow: 0 0 25px #ff6b35, 0 0 35px #ff6b35;
+  }
+}
+
+/* Fate Wheel */
+.fate-wheel {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  position: relative;
+  border: 4px solid #ff6b35;
+  box-shadow: 
+    0 0 30px rgba(255, 107, 53, 0.6),
+    inset 0 0 30px rgba(255, 107, 53, 0.2);
+  transition: transform 3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.fate-wheel.spinning {
+  box-shadow: 
+    0 0 50px rgba(255, 107, 53, 0.8),
+    inset 0 0 50px rgba(255, 107, 53, 0.4);
+}
+
+/* Wheel Segments */
+.wheel-segment {
+  position: absolute;
+  width: 50%;
+  height: 50%;
+  top: 50%;
+  left: 50%;
+  transform-origin: 0 0;
+  overflow: hidden;
+  border-left: 2px solid rgba(255, 107, 53, 0.3);
+}
+
+.wheel-segment:nth-child(odd) {
+  background: linear-gradient(45deg, rgba(255, 107, 53, 0.1) 0%, rgba(255, 107, 53, 0.05) 100%);
+}
+
+.wheel-segment:nth-child(even) {
+  background: linear-gradient(45deg, rgba(255, 107, 53, 0.05) 0%, rgba(255, 107, 53, 0.1) 100%);
+}
+
+.segment-content {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  transform: rotate(-20deg);
+}
+
+.segment-icon {
+  font-size: 20px;
+  text-shadow: 0 0 10px currentColor;
+}
+
+.segment-text {
+  font-size: 8px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-align: center;
+  line-height: 1.2;
+  color: #ff6b35;
+}
+
+/* Severity Colors */
+.severity-blessing .segment-icon,
+.severity-blessing .segment-text {
+  color: #00ff88;
+  text-shadow: 0 0 10px #00ff88;
+}
+
+.severity-neutral .segment-icon,
+.severity-neutral .segment-text {
+  color: #ffaa00;
+  text-shadow: 0 0 10px #ffaa00;
+}
+
+.severity-curse .segment-icon,
+.severity-curse .segment-text {
+  color: #ff4444;
+  text-shadow: 0 0 10px #ff4444;
+}
+
+/* Controls */
+.wheel-controls {
+  margin-bottom: 30px;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spin-button,
+.reset-button {
+  background: transparent;
+  border: 3px solid #ff6b35;
+  color: #ff6b35;
+  font-family: 'Courier New', monospace;
+  font-size: 16px;
+  padding: 15px 25px;
+  cursor: pointer;
+  letter-spacing: 3px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+.spin-button::before,
+.reset-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 107, 53, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.spin-button:hover::before,
+.reset-button:hover::before {
+  width: 400px;
+  height: 400px;
+}
+
+.spin-button:hover,
+.reset-button:hover {
+  background: rgba(255, 107, 53, 0.2);
+  box-shadow: 0 0 25px rgba(255, 107, 53, 0.7);
+  transform: translateY(-3px);
+}
+
+.button-icon {
+  font-size: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.spin-button span,
+.reset-button span {
+  position: relative;
+  z-index: 1;
+}
+
+/* Spinning Message */
+.spinning-message {
+  text-align: center;
+  color: #ff6b35;
+}
+
+.cosmic-spinner {
+  font-size: 32px;
+  margin-bottom: 15px;
+  animation: cosmic-spin 1s linear infinite;
+}
+
+@keyframes cosmic-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.spinning-message p {
+  font-size: 16px;
+  letter-spacing: 2px;
+  margin: 0;
+  animation: text-glow 2s ease-in-out infinite;
+}
+
+@keyframes text-glow {
+  0%, 100% { 
+    text-shadow: 0 0 10px #ff6b35;
+  }
+  50% { 
+    text-shadow: 0 0 20px #ff6b35, 0 0 30px #ff6b35;
+  }
+}
+
+/* Fate Result */
+.fate-result {
+  background: rgba(255, 107, 53, 0.05);
+  border: 2px solid rgba(255, 107, 53, 0.3);
+  border-radius: 6px;
+  padding: 25px;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 1s ease, transform 1s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.fate-result.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.result-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid rgba(255, 107, 53, 0.3);
+}
+
+.result-icon {
+  font-size: 32px;
+  text-shadow: 0 0 15px currentColor;
+}
+
+.result-title-container {
+  text-align: center;
+}
+
+.result-title {
+  font-size: 24px;
+  margin: 0 0 8px 0;
+  color: #ff6b35;
+  text-shadow: 0 0 10px #ff6b35;
+}
+
+.result-severity {
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  padding: 4px 12px;
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+/* Severity Result Colors */
+.result-header.severity-blessing .result-icon,
+.result-header.severity-blessing .result-title,
+.result-header.severity-blessing .result-severity {
+  color: #00ff88;
+  text-shadow: 0 0 15px #00ff88;
+}
+
+.result-header.severity-neutral .result-icon,
+.result-header.severity-neutral .result-title,
+.result-header.severity-neutral .result-severity {
+  color: #ffaa00;
+  text-shadow: 0 0 15px #ffaa00;
+}
+
+.result-header.severity-curse .result-icon,
+.result-header.severity-curse .result-title,
+.result-header.severity-curse .result-severity {
+  color: #ff4444;
+  text-shadow: 0 0 15px #ff4444;
+}
+
+/* Result Content */
+.result-content {
+  position: relative;
+  padding: 20px;
+  margin: 20px 0;
+}
+
+.result-description {
+  color: #ffcc99;
+  font-size: 16px;
+  line-height: 1.8;
+  margin: 0;
+  text-align: center;
+  font-style: italic;
+}
+
+.quote-mark {
+  position: absolute;
+  font-size: 60px;
+  color: #ff6b35;
+  opacity: 0.3;
+  font-family: Georgia, serif;
+}
+
+.quote-mark.top {
+  top: -10px;
+  left: 10px;
+}
+
+.quote-mark.bottom {
+  bottom: -30px;
+  right: 10px;
+}
+
+/* Result Footer */
+.result-footer {
+  text-align: center;
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 2px solid rgba(255, 107, 53, 0.3);
+}
+
+.fate-seal {
+  color: #ff6b35;
+  font-size: 14px;
+  font-weight: bold;
+  letter-spacing: 3px;
+  text-shadow: 0 0 10px #ff6b35;
+  animation: seal-glow 3s ease-in-out infinite;
+}
+
+@keyframes seal-glow {
+  0%, 100% { 
+    text-shadow: 0 0 10px #ff6b35;
+  }
+  50% { 
+    text-shadow: 0 0 20px #ff6b35, 0 0 30px #ff6b35;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .wheel-of-fate {
+    margin: 10px;
+    padding: 20px;
+  }
+  
+  .wheel-container {
+    width: 250px;
+    height: 250px;
+  }
+  
+  .segment-content {
+    width: 60px;
+  }
+  
+  .segment-text {
+    font-size: 7px;
+  }
+  
+  .result-title {
+    font-size: 20px;
+  }
+  
+  .result-description {
+    font-size: 14px;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .fate-wheel,
+  .wheel-icon,
+  .cosmic-spinner,
+  .fate-result {
+    animation: none;
+    transition: opacity 0.3s ease;
+  }
+}

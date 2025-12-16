@@ -14,6 +14,7 @@ app.use(express.json());
 app.use('/api/messages', messagesRouter);
 app.use('/api/fortune', fortuneRouter);
 app.use('/api/omens', require('./routes/omens'));
+app.use('/api/prophecies', require('./routes/prophecies'));
 
 // Health check
 app.get('/api/health', (req, res) => {
