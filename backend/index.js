@@ -13,6 +13,7 @@ app.use(express.json());
 // Routes
 app.use('/api/messages', messagesRouter);
 app.use('/api/fortune', fortuneRouter);
+app.use('/api/omens', require('./routes/omens'));
 
 // Health check
 app.get('/api/health', (req, res) => {
