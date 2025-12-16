@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import './ChatWindow.css';
-import { Realm } from '../../types';
+import type { Realm } from '../../types';
 import type { MessageResponse } from '../../services/messages';
 
 interface ChatWindowProps {

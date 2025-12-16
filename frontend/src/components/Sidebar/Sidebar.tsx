@@ -1,6 +1,6 @@
 import React from 'react';
 import './Sidebar.css';
-import { Realm } from '../../types';
+import type { Realm } from '../../types';
 
 interface SidebarProps {
   realms: Realm[];

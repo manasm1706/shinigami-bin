@@ -3,7 +3,7 @@ import './App.css';
 import Sidebar from './components/Sidebar/Sidebar';
 import ChatWindow from './components/ChatWindow/ChatWindow';
 import MessageInput from './components/MessageInput/MessageInput';
-import { Realm } from './types';
+import type { Realm } from './types';
 import { getMessages, sendMessage } from './services/messages';
 import type { MessageResponse } from './services/messages';
 
