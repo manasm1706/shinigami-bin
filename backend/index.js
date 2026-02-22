@@ -4,6 +4,7 @@ const { createServer } = require('http');
 const { Server } = require('socket.io');
 const messagesRouter = require('./routes/messages');
 const fortuneRouter = require('./routes/fortune');
+const messageStore = require('./data/messageStore');
 
 const app = express();
 const server = createServer(app);
@@ -52,6 +53,10 @@ io.on('connection', (socket) => {
     
     console.log(`🌟 ${username} joined realm: ${realm}`);
     
+    // Send recent messages to the joining user
+    const recentMessages = messageStore.getRecentMessages(realm, 20);
+    socket.emit('realm_history', { realm, messages: recentMessages });
+    
     // Notify others in the realm
     socket.to(roomName).emit('user_joined', { username, realm });
     
@@ -68,6 +73,9 @@ io.on('connection', (socket) => {
       realm,
       timestamp: new Date().toISOString()
     };
+
+    // Store message in memory
+    messageStore.addMessage(message);
 
     console.log(`💬 Message in ${realm}: ${sender}: ${text}`);
     
@@ -111,6 +119,15 @@ app.get('/api/health', (req, res) => {
   res.json({ 
     status: 'alive',
     service: 'Shinigami-bin API',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Message store statistics (for debugging)
+app.get('/api/messages/stats', (req, res) => {
+  const stats = messageStore.getStats();
+  res.json({
+    ...stats,
     timestamp: new Date().toISOString()
   });
 });

@@ -64,6 +64,11 @@ export const useChat = (initialRealm?: string, username?: string): UseChatReturn
       setUsers(realmUsers);
     };
 
+    const handleRealmHistory = ({ realm, messages: historyMessages }: { realm: string; messages: ChatMessage[] }) => {
+      console.log(`📜 Received ${historyMessages.length} historical messages for ${realm}`);
+      setMessages(historyMessages);
+    };
+
     // Register event listeners
     socketInstance.on('connect', handleConnect);
     socketInstance.on('disconnect', handleDisconnect);
@@ -71,6 +76,7 @@ export const useChat = (initialRealm?: string, username?: string): UseChatReturn
     socketInstance.on('user_joined', handleUserJoined);
     socketInstance.on('user_left', handleUserLeft);
     socketInstance.on('realm_users', handleRealmUsers);
+    socketInstance.on('realm_history', handleRealmHistory);
 
     // Auto-join initial realm if provided
     if (initialRealm && username) {
@@ -87,13 +93,13 @@ export const useChat = (initialRealm?: string, username?: string): UseChatReturn
       socketInstance.off('user_joined', handleUserJoined);
       socketInstance.off('user_left', handleUserLeft);
       socketInstance.off('realm_users', handleRealmUsers);
+      socketInstance.off('realm_history', handleRealmHistory);
     };
   }, [initialRealm, username]);
 
   const joinRealm = useCallback((realm: string, username: string) => {
     if (socket && isConnected) {
-      // Clear messages when switching realms
-      setMessages([]);
+      // Don't clear messages here - let realm_history handle it
       setUsers([]);
       
       socket.emit('join_realm', { realm, username });
