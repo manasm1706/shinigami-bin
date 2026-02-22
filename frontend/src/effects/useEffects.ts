@@ -1,5 +1,6 @@
 import { useEffect, useCallback, useRef } from 'react';
-import { effectSystem, EffectEvent, EffectListener, EffectPayload } from './EffectSystem';
+import { effectSystem } from './EffectSystem';
+import type { EffectEvent, EffectListener, EffectPayload } from './EffectSystem';
 
 export interface UseEffectsReturn {
   triggerEffect: (type: string, payload?: EffectPayload) => void;

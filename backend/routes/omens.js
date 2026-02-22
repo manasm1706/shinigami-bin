@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { validateCity, createValidationMiddleware } = require('../utils/inputValidation');
 
 // ============================================================================
 // MCP INTEGRATION NOTES
@@ -151,40 +152,12 @@ async function mockMCPWeatherOmenCall(city) {
 }
 
 /**
- * Validate city name parameter
- * @param {string} city - City name to validate
- * @returns {Object} Validation result
+ * Validate city name parameter (legacy - replaced by inputValidation.js)
+ * @deprecated Use validateCity from inputValidation.js instead
  */
 function validateCityName(city) {
-  if (!city) {
-    return {
-      valid: false,
-      error: 'City parameter is required'
-    };
-  }
-
-  if (typeof city !== 'string') {
-    return {
-      valid: false,
-      error: 'City must be a string'
-    };
-  }
-
-  if (city.trim().length === 0) {
-    return {
-      valid: false,
-      error: 'City name cannot be empty'
-    };
-  }
-
-  if (city.trim().length > 100) {
-    return {
-      valid: false,
-      error: 'City name must be 100 characters or less'
-    };
-  }
-
-  return { valid: true };
+  // Use the new validation function
+  return validateCity(city);
 }
 
 // ============================================================================
@@ -198,19 +171,17 @@ function validateCityName(city) {
  * and the weather-omen MCP server. It provides a REST API interface
  * for the MCP tool functionality.
  */
-router.get('/weather', async (req, res) => {
-  try {
-    const { city } = req.query;
-
-    // Validate city parameter
-    const validation = validateCityName(city);
-    if (!validation.valid) {
-      return res.status(400).json({ 
-        error: validation.error,
-        example: '/api/omens/weather?city=Tokyo'
-      });
+router.get('/weather', 
+  createValidationMiddleware({
+    query: {
+      city: validateCity
     }
+  }),
+  async (req, res) => {
+    try {
+      const { city } = req.query;
 
+    // City validation handled by middleware
     // ========================================================================
     // MCP TOOL INVOCATION
     // ========================================================================
@@ -218,7 +189,7 @@ router.get('/weather', async (req, res) => {
     // const omenData = await callWeatherOmenMCP(city.trim());
     // 
     // For now, using mock implementation:
-    const omenData = await mockMCPWeatherOmenCall(city.trim());
+    const omenData = await mockMCPWeatherOmenCall(city);
     // ========================================================================
 
     // Return standardized response format

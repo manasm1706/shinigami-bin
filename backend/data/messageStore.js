@@ -8,7 +8,7 @@ class MessageStore {
     // Map of realm -> array of messages
     this.messages = new Map();
     // Maximum messages to keep per realm (prevent memory overflow)
-    this.maxMessagesPerRealm = 100;
+    this.maxMessagesPerRealm = 200; // Increased to 200 as requested
   }
 
   /**
@@ -28,9 +28,11 @@ class MessageStore {
     const realmMessages = this.messages.get(message.realm);
     realmMessages.push(message);
 
-    // Keep only the most recent messages
+    // Keep only the most recent messages (memory safety)
     if (realmMessages.length > this.maxMessagesPerRealm) {
-      realmMessages.shift(); // Remove oldest message
+      const removedCount = realmMessages.length - this.maxMessagesPerRealm;
+      realmMessages.splice(0, removedCount); // Remove oldest messages
+      console.log(`🗑️ Removed ${removedCount} old messages from ${message.realm} (keeping ${this.maxMessagesPerRealm} most recent)`);
     }
 
     console.log(`📝 Stored message in ${message.realm}: ${message.sender}: ${message.text}`);
@@ -86,18 +88,45 @@ class MessageStore {
   getStats() {
     const stats = {
       totalRealms: this.messages.size,
+      maxMessagesPerRealm: this.maxMessagesPerRealm,
+      totalMessages: 0,
       realms: {}
     };
 
     this.messages.forEach((messages, realm) => {
+      stats.totalMessages += messages.length;
       stats.realms[realm] = {
         messageCount: messages.length,
+        memoryUsage: `${messages.length}/${this.maxMessagesPerRealm}`,
         oldestMessage: messages.length > 0 ? messages[0].timestamp : null,
         newestMessage: messages.length > 0 ? messages[messages.length - 1].timestamp : null
       };
     });
 
     return stats;
+  }
+
+  /**
+   * Get memory usage information
+   * @returns {Object} Memory usage statistics
+   */
+  getMemoryUsage() {
+    let totalMessages = 0;
+    let totalMemoryEstimate = 0;
+    
+    this.messages.forEach((messages) => {
+      totalMessages += messages.length;
+      // Rough estimate: ~200 bytes per message
+      totalMemoryEstimate += messages.length * 200;
+    });
+
+    return {
+      totalMessages,
+      maxCapacity: this.messages.size * this.maxMessagesPerRealm,
+      utilizationPercent: Math.round((totalMessages / (this.messages.size * this.maxMessagesPerRealm || 1)) * 100),
+      estimatedMemoryBytes: totalMemoryEstimate,
+      estimatedMemoryMB: Math.round(totalMemoryEstimate / 1024 / 1024 * 100) / 100
+    };
   }
 }
 
