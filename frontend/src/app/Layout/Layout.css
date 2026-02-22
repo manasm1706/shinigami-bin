@@ -1,0 +1,162 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #000;
+  font-family: 'Courier New', monospace;
+}
+
+.layout-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 25px;
+  background: linear-gradient(180deg, #0f0f0f 0%, #0a0a0a 100%);
+  border-bottom: 2px solid #00ff41;
+  box-shadow: 0 2px 10px rgba(0, 255, 65, 0.3);
+  position: relative;
+  z-index: 100;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.app-title {
+  font-size: 24px;
+  color: #00ff41;
+  margin: 0;
+  text-shadow: 0 0 10px #00ff41, 0 0 20px #00ff41;
+  letter-spacing: 2px;
+}
+
+.subtitle {
+  font-size: 10px;
+  color: #00aa33;
+  letter-spacing: 3px;
+  opacity: 0.8;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 15px;
+  background: rgba(0, 255, 65, 0.1);
+  border: 1px solid rgba(0, 255, 65, 0.3);
+  border-radius: 4px;
+}
+
+.user-label {
+  color: #00aa33;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.username {
+  color: #00ff41;
+  font-size: 14px;
+  font-weight: bold;
+  text-shadow: 0 0 5px #00ff41;
+}
+
+.logout-button {
+  background: transparent;
+  border: 2px solid #ff4444;
+  color: #ff4444;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  padding: 8px 15px;
+  cursor: pointer;
+  letter-spacing: 2px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 4px;
+}
+
+.logout-button:hover {
+  background: rgba(255, 68, 68, 0.2);
+  box-shadow: 0 0 15px rgba(255, 68, 68, 0.5);
+  transform: translateY(-1px);
+}
+
+.logout-icon {
+  font-size: 14px;
+}
+
+.layout-content {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+/* CRT screen effect for layout */
+.layout::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.3) 100%);
+  pointer-events: none;
+  z-index: 999;
+}
+
+.layout::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 50%,
+    rgba(0, 255, 65, 0.02) 50%
+  );
+  background-size: 100% 4px;
+  pointer-events: none;
+  z-index: 999;
+  animation: scanline 8s linear infinite;
+}
+
+@keyframes scanline {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(4px); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .layout-header {
+    flex-direction: column;
+    gap: 15px;
+    padding: 15px 20px;
+  }
+  
+  .header-left,
+  .header-right {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .app-title {
+    font-size: 20px;
+  }
+  
+  .user-info {
+    flex: 1;
+    justify-content: center;
+  }
+}
