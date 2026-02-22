@@ -1,0 +1,146 @@
+.crt-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 10000;
+  overflow: hidden;
+}
+
+/* Scanlines effect */
+.crt-scanlines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 2px,
+    rgba(0, 255, 65, 0.03) 2px,
+    rgba(0, 255, 65, 0.03) 4px
+  );
+  animation: scanlines-move 0.1s linear infinite;
+}
+
+@keyframes scanlines-move {
+  0% { transform: translateY(0px); }
+  100% { transform: translateY(4px); }
+}
+
+/* Screen curvature and distortion */
+.crt-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 0%,
+    transparent 70%,
+    rgba(0, 0, 0, 0.1) 100%
+  );
+  border-radius: 10px;
+}
+
+/* Flicker effect */
+.crt-flicker {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 255, 65, 0.01);
+  animation: crt-flicker 0.15s ease-in-out infinite alternate;
+}
+
+@keyframes crt-flicker {
+  0% { opacity: 1; }
+  100% { opacity: 0.95; }
+}
+
+/* Vignette effect */
+.crt-vignette {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 0%,
+    transparent 60%,
+    rgba(0, 0, 0, 0.2) 100%
+  );
+}
+
+/* Intensity variations */
+.crt-overlay.low .crt-scanlines {
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 3px,
+    rgba(0, 255, 65, 0.01) 3px,
+    rgba(0, 255, 65, 0.01) 6px
+  );
+}
+
+.crt-overlay.low .crt-flicker {
+  background: rgba(0, 255, 65, 0.005);
+  animation-duration: 0.3s;
+}
+
+.crt-overlay.medium .crt-scanlines {
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 2px,
+    rgba(0, 255, 65, 0.03) 2px,
+    rgba(0, 255, 65, 0.03) 4px
+  );
+}
+
+.crt-overlay.medium .crt-flicker {
+  background: rgba(0, 255, 65, 0.01);
+  animation-duration: 0.15s;
+}
+
+.crt-overlay.high .crt-scanlines {
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 1px,
+    rgba(0, 255, 65, 0.05) 1px,
+    rgba(0, 255, 65, 0.05) 2px
+  );
+}
+
+.crt-overlay.high .crt-flicker {
+  background: rgba(0, 255, 65, 0.02);
+  animation-duration: 0.1s;
+}
+
+.crt-overlay.high .crt-vignette {
+  background: radial-gradient(
+    ellipse at center,
+    transparent 0%,
+    transparent 50%,
+    rgba(0, 0, 0, 0.3) 100%
+  );
+}
+
+/* Accessibility - Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .crt-scanlines,
+  .crt-flicker {
+    animation: none;
+  }
+  
+  .crt-overlay.high .crt-scanlines {
+    opacity: 0.5;
+  }
+}

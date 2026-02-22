@@ -1,11 +1,18 @@
 import React from 'react';
 import { Outlet, Navigate } from 'react-router-dom';
 import { useAuth } from '../../auth/useAuth';
-import { EffectGhostOverlay } from '../../effects';
+import { 
+  EffectGhostOverlay, 
+  CRTOverlay, 
+  GlitchText, 
+  EffectSettingsPanel,
+  useEffectSettings 
+} from '../../effects';
 import './Layout.css';
 
 const Layout: React.FC = () => {
   const { isAuthenticated, username, logout } = useAuth();
+  const { settings } = useEffectSettings();
 
   // Redirect to login if not authenticated
   if (!isAuthenticated) {
@@ -16,14 +23,26 @@ const Layout: React.FC = () => {
     <div className="layout">
       <header className="layout-header">
         <div className="header-left">
-          <h1 className="app-title">死神-BIN</h1>
+          <GlitchText 
+            enabled={settings.glitchText.enabled}
+            intensity={settings.glitchText.intensity}
+            trigger={settings.glitchText.trigger}
+          >
+            <h1 className="app-title">死神-BIN</h1>
+          </GlitchText>
           <span className="subtitle">SHINIGAMI TERMINAL</span>
         </div>
         
         <div className="header-right">
           <div className="user-info">
             <span className="user-label">SOUL:</span>
-            <span className="username">{username}</span>
+            <GlitchText 
+              enabled={settings.glitchText.enabled}
+              intensity="low"
+              trigger="hover"
+            >
+              <span className="username">{username}</span>
+            </GlitchText>
           </div>
           <button className="logout-button" onClick={logout}>
             <span className="logout-icon">⚡</span>
@@ -36,8 +55,17 @@ const Layout: React.FC = () => {
         <Outlet />
       </main>
       
+      {/* Global visual effects */}
+      <CRTOverlay 
+        enabled={settings.crtOverlay.enabled}
+        intensity={settings.crtOverlay.intensity}
+      />
+      
       {/* Global effect overlay - listens for effect events */}
-      <EffectGhostOverlay />
+      {settings.ghostEffects.enabled && <EffectGhostOverlay />}
+      
+      {/* Effect settings panel */}
+      <EffectSettingsPanel />
     </div>
   );
 };

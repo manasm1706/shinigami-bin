@@ -1,0 +1,227 @@
+.glitch-text {
+  position: relative;
+  display: inline-block;
+  font-family: 'Courier New', monospace;
+}
+
+.glitch-content {
+  position: relative;
+  z-index: 3;
+}
+
+.glitch-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.glitch-layer-1 {
+  z-index: 1;
+  color: #ff0040;
+  animation: glitch-1 0.3s ease-in-out infinite alternate;
+}
+
+.glitch-layer-2 {
+  z-index: 2;
+  color: #00ffff;
+  animation: glitch-2 0.3s ease-in-out infinite alternate;
+}
+
+/* Base glitch animations */
+@keyframes glitch-1 {
+  0% {
+    transform: translateX(0);
+    opacity: 0;
+  }
+  10% {
+    transform: translateX(-2px);
+    opacity: 1;
+  }
+  20% {
+    transform: translateX(2px);
+    opacity: 0;
+  }
+  30% {
+    transform: translateX(-1px);
+    opacity: 1;
+  }
+  40% {
+    transform: translateX(1px);
+    opacity: 0;
+  }
+  50% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 0;
+  }
+}
+
+@keyframes glitch-2 {
+  0% {
+    transform: translateX(0);
+    opacity: 0;
+  }
+  15% {
+    transform: translateX(1px);
+    opacity: 1;
+  }
+  25% {
+    transform: translateX(-1px);
+    opacity: 0;
+  }
+  35% {
+    transform: translateX(2px);
+    opacity: 1;
+  }
+  45% {
+    transform: translateX(-2px);
+    opacity: 0;
+  }
+  55% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 0;
+  }
+}
+
+/* Intensity variations */
+.glitch-text.low .glitch-layer-1 {
+  animation-duration: 0.5s;
+  color: rgba(255, 0, 64, 0.3);
+}
+
+.glitch-text.low .glitch-layer-2 {
+  animation-duration: 0.5s;
+  color: rgba(0, 255, 255, 0.3);
+}
+
+.glitch-text.medium .glitch-layer-1 {
+  animation-duration: 0.3s;
+  color: rgba(255, 0, 64, 0.6);
+}
+
+.glitch-text.medium .glitch-layer-2 {
+  animation-duration: 0.3s;
+  color: rgba(0, 255, 255, 0.6);
+}
+
+.glitch-text.high .glitch-layer-1 {
+  animation-duration: 0.1s;
+  color: #ff0040;
+}
+
+.glitch-text.high .glitch-layer-2 {
+  animation-duration: 0.1s;
+  color: #00ffff;
+}
+
+/* Trigger-specific styles */
+.glitch-text.hover .glitch-layer {
+  animation-play-state: paused;
+}
+
+.glitch-text.hover.glitching .glitch-layer {
+  animation-play-state: running;
+}
+
+.glitch-text.continuous .glitch-layer {
+  animation-play-state: running;
+}
+
+.glitch-text.random .glitch-layer {
+  animation-play-state: paused;
+}
+
+.glitch-text.random.glitching .glitch-layer {
+  animation-play-state: running;
+}
+
+/* Enhanced glitch effect when active */
+.glitch-text.glitching {
+  text-shadow: 
+    0.05em 0 0 #ff0040,
+    -0.05em -0.025em 0 #00ffff,
+    0.025em 0.05em 0 #ffff00;
+}
+
+.glitch-text.glitching .glitch-content {
+  animation: content-glitch 0.2s ease-in-out infinite;
+}
+
+@keyframes content-glitch {
+  0%, 100% {
+    transform: translate(0);
+  }
+  20% {
+    transform: translate(-1px, 1px);
+  }
+  40% {
+    transform: translate(-1px, -1px);
+  }
+  60% {
+    transform: translate(1px, 1px);
+  }
+  80% {
+    transform: translate(1px, -1px);
+  }
+}
+
+/* High intensity additional effects */
+.glitch-text.high.glitching {
+  filter: contrast(1.2) brightness(1.1);
+}
+
+.glitch-text.high.glitching::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 100%
+  );
+  animation: scan-line 0.1s linear infinite;
+  z-index: 4;
+  pointer-events: none;
+}
+
+@keyframes scan-line {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Accessibility - Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .glitch-text .glitch-layer,
+  .glitch-text .glitch-content,
+  .glitch-text::before {
+    animation: none !important;
+  }
+  
+  .glitch-text.glitching {
+    text-shadow: none;
+    filter: none;
+  }
+  
+  .glitch-text.glitching .glitch-layer {
+    opacity: 0.3;
+    transform: none;
+  }
+}

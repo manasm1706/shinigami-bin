@@ -1,0 +1,209 @@
+.effect-settings-panel {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: rgba(0, 0, 0, 0.9);
+  border: 2px solid #00aa33;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  color: #00ff41;
+  z-index: 9998;
+  min-width: 200px;
+  backdrop-filter: blur(10px);
+}
+
+.settings-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 15px;
+  background: transparent;
+  border: none;
+  color: #00ff41;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.settings-toggle:hover {
+  background: rgba(0, 255, 65, 0.1);
+  color: #00ff41;
+}
+
+.toggle-icon {
+  font-size: 14px;
+}
+
+.toggle-text {
+  font-weight: bold;
+}
+
+.settings-content {
+  border-top: 1px solid #00aa33;
+  padding: 15px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #00aa33;
+}
+
+.settings-header h3 {
+  margin: 0;
+  font-size: 14px;
+  color: #00ff41;
+  text-shadow: 0 0 3px #00ff41;
+}
+
+.reset-button {
+  background: transparent;
+  border: 1px solid #00aa33;
+  color: #00aa33;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  padding: 4px 8px;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.2s;
+}
+
+.reset-button:hover {
+  border-color: #00ff41;
+  color: #00ff41;
+  box-shadow: 0 0 5px rgba(0, 255, 65, 0.3);
+}
+
+.setting-group {
+  margin-bottom: 15px;
+  padding: 10px;
+  background: rgba(0, 255, 65, 0.02);
+  border: 1px solid rgba(0, 170, 51, 0.3);
+  border-radius: 2px;
+}
+
+.setting-header {
+  margin-bottom: 8px;
+}
+
+.setting-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  cursor: pointer;
+  color: #00ff41;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.setting-label input[type="checkbox"] {
+  accent-color: #00ff41;
+  width: 14px;
+  height: 14px;
+}
+
+.setting-controls {
+  margin-left: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.control-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.control-label,
+.intensity-label {
+  font-size: 11px;
+  color: #00aa33;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.control-select,
+.intensity-select {
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid #00aa33;
+  color: #00ff41;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 2px;
+  min-width: 80px;
+}
+
+.control-select:focus,
+.intensity-select:focus {
+  outline: none;
+  border-color: #00ff41;
+  box-shadow: 0 0 5px rgba(0, 255, 65, 0.3);
+}
+
+.settings-info {
+  margin-top: 15px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(0, 170, 51, 0.3);
+}
+
+.settings-info p {
+  margin: 0;
+  font-size: 10px;
+  color: #00aa33;
+  opacity: 0.8;
+  line-height: 1.4;
+  text-align: center;
+}
+
+/* Collapsed state */
+.effect-settings-panel.collapsed .settings-content {
+  display: none;
+}
+
+/* Scrollbar styling */
+.settings-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.settings-content::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.settings-content::-webkit-scrollbar-thumb {
+  background: #00aa33;
+  border-radius: 3px;
+}
+
+.settings-content::-webkit-scrollbar-thumb:hover {
+  background: #00ff41;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .effect-settings-panel {
+    top: 10px;
+    right: 10px;
+    min-width: 180px;
+  }
+  
+  .settings-toggle {
+    padding: 8px 12px;
+    font-size: 11px;
+  }
+  
+  .settings-content {
+    padding: 12px;
+  }
+}
