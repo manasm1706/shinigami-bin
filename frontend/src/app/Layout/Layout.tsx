@@ -1,6 +1,7 @@
 import React from 'react';
 import { Outlet, Navigate } from 'react-router-dom';
 import { useAuth } from '../../auth/useAuth';
+import { EffectGhostOverlay } from '../../effects';
 import './Layout.css';
 
 const Layout: React.FC = () => {
@@ -34,6 +35,9 @@ const Layout: React.FC = () => {
       <main className="layout-content">
         <Outlet />
       </main>
+      
+      {/* Global effect overlay - listens for effect events */}
+      <EffectGhostOverlay />
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRituals } from '../useRituals';
+import { completeRitualWithEffects } from '../../effects/RitualEffectMapper';
 import type { RitualDefinition, RitualResult } from '../RitualRegistry';
 import './RitualExecutor.css';
 
@@ -58,8 +59,14 @@ const RitualExecutor: React.FC<RitualExecutorProps> = ({
     try {
       const result = await executeRitual(ritualId, params);
       
-      if (result.success && onResult) {
-        onResult(result);
+      // Trigger effects AFTER ritual completes successfully
+      if (result.success) {
+        console.log(`🎭 Ritual completed successfully, triggering effects for: ${result.type}`);
+        completeRitualWithEffects(result);
+        
+        if (onResult) {
+          onResult(result);
+        }
       } else if (!result.success && result.error && onError) {
         onError(result.error);
       }

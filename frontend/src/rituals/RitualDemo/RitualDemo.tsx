@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useRituals } from '../useRituals';
 import { RitualExecutor } from '../';
 import { useAuth } from '../../auth/useAuth';
+import MCPStatus from '../MCPStatus/MCPStatus';
 import './RitualDemo.css';
 
 const RitualDemo: React.FC = () => {
@@ -88,9 +89,23 @@ const RitualDemo: React.FC = () => {
                         {lastResults[ritual.id].data?.omen || 'No omen revealed'}
                       </div>
                       <div className="result-meta">
-                        Weather: {lastResults[ritual.id].data?.weather || 'unknown'} | 
+                        Weather: {lastResults[ritual.id].data?.weather?.condition || 'unknown'} | 
                         Severity: {lastResults[ritual.id].data?.severity || 'unknown'}
+                        {lastResults[ritual.id].data?.mcpIntegration && (
+                          <div className="mcp-indicator">
+                            🔗 MCP Server Integration Active
+                          </div>
+                        )}
                       </div>
+                      {lastResults[ritual.id].data?.weather && (
+                        <div className="weather-details">
+                          <small>
+                            {lastResults[ritual.id].data.weather.temperature}°C, 
+                            {lastResults[ritual.id].data.weather.humidity}% humidity, 
+                            {lastResults[ritual.id].data.weather.windSpeed} km/h wind
+                          </small>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -133,6 +148,8 @@ const RitualDemo: React.FC = () => {
         <p>Total Rituals: {rituals.length}</p>
         <p>Categories: Divination ({divinationRituals.length}), Omens ({omenRituals.length}), Fate ({fateRituals.length})</p>
       </div>
+
+      <MCPStatus className="mcp-status-panel" />
     </div>
   );
 };

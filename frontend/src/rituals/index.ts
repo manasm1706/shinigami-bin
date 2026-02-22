@@ -6,6 +6,8 @@ export { default as ProphecyCard } from '../components/ProphecyCard/ProphecyCard
 
 // New ritual system
 export { default as RitualExecutor } from './RitualExecutor/RitualExecutor';
+export { default as RitualDemo } from './RitualDemo/RitualDemo';
+export { default as MCPStatus } from './MCPStatus/MCPStatus';
 export { useRituals } from './useRituals';
 export { ritualRegistry, initializeRituals } from './initRituals';
 export type { RitualDefinition, RitualResult } from './RitualRegistry';
