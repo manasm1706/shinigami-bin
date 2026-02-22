@@ -65,6 +65,16 @@
   border-left-color: #00ff41;
 }
 
+.realm-item:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.realm-item:disabled:hover {
+  background: transparent;
+  border-left-color: transparent;
+}
+
 .realm-item.active {
   background: rgba(0, 255, 65, 0.2);
   border-left-color: #00ff41;
@@ -79,6 +89,12 @@
   flex: 1;
 }
 
+.user-count {
+  font-size: 10px;
+  color: #00aa33;
+  opacity: 0.8;
+}
+
 .sidebar-footer {
   padding: 15px 20px;
   border-top: 2px solid #00ff41;
@@ -88,6 +104,28 @@
 .status-line {
   color: #00aa33;
   font-size: 11px;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.status-line.connected {
+  color: #00ff41;
+}
+
+.status-line.disconnected {
+  color: #ff4444;
+}
+
+.realm-info {
+  margin-top: 8px;
+  font-size: 10px;
+  color: #00aa33;
+  opacity: 0.8;
+}
+
+.crt-text {
   letter-spacing: 1px;
 }
 

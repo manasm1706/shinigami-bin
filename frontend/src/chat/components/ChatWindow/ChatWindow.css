@@ -53,6 +53,39 @@
   color: #00ff41;
   letter-spacing: 2px;
   text-transform: uppercase;
+  flex: 1;
+}
+
+.connection-status {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  letter-spacing: 1px;
+  padding: 4px 8px;
+  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.connection-status.connected {
+  color: #00ff41;
+  border: 1px solid #00ff41;
+}
+
+.connection-status.disconnected {
+  color: #ff4444;
+  border: 1px solid #ff4444;
+}
+
+.status-dot {
+  font-size: 8px;
+  animation: pulse-dot 2s infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
 }
 
 .realm-description {
@@ -91,6 +124,13 @@
 .empty-state p {
   font-size: 14px;
   opacity: 0.7;
+}
+
+.connection-warning {
+  color: #ff4444 !important;
+  font-size: 12px !important;
+  margin-top: 10px;
+  animation: blink 2s infinite;
 }
 
 .message {

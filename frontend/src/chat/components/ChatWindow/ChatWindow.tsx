@@ -1,16 +1,23 @@
 import React, { useEffect, useRef } from 'react';
 import './ChatWindow.css';
 import type { Realm } from '../../../types';
-import type { MessageResponse } from '../../../services/messages';
+import type { ChatMessage } from '../../useChat';
 
 interface ChatWindowProps {
-  messages: MessageResponse[];
+  messages: ChatMessage[];
   activeRealm: Realm | null;
   loading?: boolean;
   error?: string | null;
+  isConnected?: boolean;
 }
 
-const ChatWindow: React.FC<ChatWindowProps> = ({ messages, activeRealm, loading = false, error = null }) => {
+const ChatWindow: React.FC<ChatWindowProps> = ({ 
+  messages, 
+  activeRealm, 
+  loading = false, 
+  error = null,
+  isConnected = false
+}) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -36,6 +43,10 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ messages, activeRealm, loading 
         <div className="realm-info">
           <span className="realm-indicator">◆</span>
           <span className="realm-title">{activeRealm?.name || 'Select a Realm'}</span>
+          <div className={`connection-status ${isConnected ? 'connected' : 'disconnected'}`}>
+            <span className="status-dot">●</span>
+            {isConnected ? 'LIVE' : 'OFFLINE'}
+          </div>
         </div>
         {activeRealm && (
           <div className="realm-description">{activeRealm.description}</div>
@@ -62,9 +73,13 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ messages, activeRealm, loading 
             <div className="ascii-art">
               ╔═══════════════════════════╗<br/>
               ║   SHINIGAMI TERMINAL v1.0 ║<br/>
+              ║      REAL-TIME CHAT       ║<br/>
               ╚═══════════════════════════╝
             </div>
             <p>No messages yet. Start the conversation...</p>
+            {!isConnected && (
+              <p className="connection-warning">⚠ Waiting for connection to the ethereal plane...</p>
+            )}
           </div>
         ) : (
           messages.map((message) => (

@@ -6,9 +6,17 @@ interface SidebarProps {
   realms: Realm[];
   activeRealmId: string;
   onRealmSelect: (realmId: string) => void;
+  isConnected?: boolean;
+  userCount?: number;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ realms, activeRealmId, onRealmSelect }) => {
+const Sidebar: React.FC<SidebarProps> = ({ 
+  realms, 
+  activeRealmId, 
+  onRealmSelect, 
+  isConnected = false,
+  userCount = 0
+}) => {
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
@@ -25,17 +33,27 @@ const Sidebar: React.FC<SidebarProps> = ({ realms, activeRealmId, onRealmSelect 
             key={realm.id}
             className={`realm-item ${activeRealmId === realm.id ? 'active' : ''}`}
             onClick={() => onRealmSelect(realm.id)}
+            disabled={!isConnected}
           >
             <span className="realm-icon">◆</span>
             <span className="realm-name">{realm.name}</span>
+            {activeRealmId === realm.id && userCount > 0 && (
+              <span className="user-count">({userCount})</span>
+            )}
           </button>
         ))}
       </nav>
 
       <div className="sidebar-footer">
-        <div className="status-line">
-          <span className="crt-flicker">●</span> CONNECTED
+        <div className={`status-line ${isConnected ? 'connected' : 'disconnected'}`}>
+          <span className="crt-flicker">●</span> 
+          {isConnected ? 'CONNECTED' : 'DISCONNECTED'}
         </div>
+        {isConnected && (
+          <div className="realm-info">
+            <span className="crt-text">SOULS PRESENT: {userCount}</span>
+          </div>
+        )}
       </div>
     </aside>
   );

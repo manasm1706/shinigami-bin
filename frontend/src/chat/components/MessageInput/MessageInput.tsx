@@ -2,25 +2,22 @@ import React, { useState, KeyboardEvent } from 'react';
 import './MessageInput.css';
 
 interface MessageInputProps {
-  onSendMessage: (content: string) => Promise<void>;
+  onSendMessage: (content: string) => void;
   disabled?: boolean;
+  isConnected?: boolean;
 }
 
-const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage, disabled = false }) => {
+const MessageInput: React.FC<MessageInputProps> = ({ 
+  onSendMessage, 
+  disabled = false,
+  isConnected = false
+}) => {
   const [message, setMessage] = useState('');
-  const [sending, setSending] = useState(false);
 
-  const handleSend = async () => {
-    if (message.trim() && !disabled && !sending) {
-      setSending(true);
-      try {
-        await onSendMessage(message.trim());
-        setMessage('');
-      } catch (error) {
-        console.error('Failed to send message:', error);
-      } finally {
-        setSending(false);
-      }
+  const handleSend = () => {
+    if (message.trim() && !disabled && isConnected) {
+      onSendMessage(message.trim());
+      setMessage('');
     }
   };
 
@@ -31,6 +28,12 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage, disabled = f
     }
   };
 
+  const getPlaceholder = () => {
+    if (!isConnected) return 'Connecting to the ethereal plane...';
+    if (disabled) return 'Select a realm to chat...';
+    return 'Type your message to the spirits...';
+  };
+
   return (
     <div className="message-input-container">
       <div className="input-wrapper">
@@ -38,20 +41,25 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage, disabled = f
         <input
           type="text"
           className="message-input"
-          placeholder={disabled ? 'Select a realm to chat...' : 'Type your message...'}
+          placeholder={getPlaceholder()}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyPress={handleKeyPress}
-          disabled={disabled || sending}
+          disabled={disabled || !isConnected}
         />
         <button 
           className="send-button" 
           onClick={handleSend}
-          disabled={disabled || !message.trim() || sending}
+          disabled={disabled || !message.trim() || !isConnected}
         >
-          {sending ? 'SENDING...' : 'SEND ▶'}
+          {!isConnected ? 'OFFLINE' : 'SEND ▶'}
         </button>
       </div>
+      {!isConnected && (
+        <div className="connection-warning">
+          ⚠ Connection lost to the spirit realm
+        </div>
+      )}
     </div>
   );
 };

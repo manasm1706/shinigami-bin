@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Sidebar, ChatWindow, MessageInput } from './';
 import { useAuth } from '../auth/useAuth';
-import { getMessages, sendMessage } from '../services/messages';
-import type { MessageResponse } from '../services/messages';
+import { useChat } from './useChat';
 import type { Realm } from '../types';
 import './ChatPage.css';
 
@@ -29,48 +28,30 @@ const ChatPage: React.FC = () => {
   const { username } = useAuth();
   const [realms] = useState<Realm[]>(initialRealms);
   const [activeRealmId, setActiveRealmId] = useState<string>('living');
-  const [messages, setMessages] = useState<MessageResponse[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+
+  const { 
+    messages, 
+    users, 
+    isConnected, 
+    joinRealm, 
+    sendMessage 
+  } = useChat();
 
   const activeRealm = realms.find(r => r.id === activeRealmId) || null;
 
-  // Fetch messages when realm changes
+  // Join realm when component mounts or realm changes
   useEffect(() => {
-    const fetchMessages = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const fetchedMessages = await getMessages(activeRealmId);
-        setMessages(fetchedMessages);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load messages');
-        console.error('Failed to fetch messages:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchMessages();
-  }, [activeRealmId]);
+    if (username && activeRealmId) {
+      joinRealm(activeRealmId, username);
+    }
+  }, [activeRealmId, username, joinRealm]);
 
   const handleRealmSelect = (realmId: string) => {
     setActiveRealmId(realmId);
   };
 
-  const handleSendMessage = async (content: string) => {
-    setError(null);
-    try {
-      const newMessage = await sendMessage({
-        sender: username || 'Anonymous',
-        text: content,
-        realm: activeRealmId
-      });
-      setMessages([...messages, newMessage]);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to send message');
-      console.error('Failed to send message:', err);
-    }
+  const handleSendMessage = (content: string) => {
+    sendMessage(content);
   };
 
   return (
@@ -79,17 +60,21 @@ const ChatPage: React.FC = () => {
         realms={realms}
         activeRealmId={activeRealmId}
         onRealmSelect={handleRealmSelect}
+        isConnected={isConnected}
+        userCount={users.length}
       />
       <div className="chat-main">
         <ChatWindow 
           messages={messages}
           activeRealm={activeRealm}
-          loading={loading}
-          error={error}
+          loading={false}
+          error={!isConnected ? 'Disconnected from the ethereal plane' : null}
+          isConnected={isConnected}
         />
         <MessageInput 
           onSendMessage={handleSendMessage}
-          disabled={!activeRealmId || loading}
+          disabled={!activeRealmId || !isConnected}
+          isConnected={isConnected}
         />
       </div>
     </div>
