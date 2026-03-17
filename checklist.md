@@ -2,154 +2,163 @@
 
 ## ✅ Completed Features
 
-### 🏗️ Core Architecture
-- [x] **React + TypeScript Frontend** - Modern web app with type safety
-- [x] **Node.js + Express Backend** - RESTful API server
-- [x] **Socket.IO Integration** - Real-time bidirectional communication
-- [x] **Modular Architecture** - Clean separation of concerns
-- [x] **Feature-based Structure** - Organized by functionality
+### Core Architecture
+- [x] React + TypeScript + Vite frontend
+- [x] Node.js + Express + Socket.IO backend
+- [x] Feature-based directory structure (app/, auth/, chat/, rituals/, effects/, services/)
+- [x] React Router with /login and /chat routes
+- [x] Layout wrapper with header and logout
 
-### 🗨️ Real-time Chat System
-- [x] **Multi-realm Messaging** - Living, Beyond, Unknown realms
-- [x] **Socket.IO Events** - join_realm, send_message, receive_message
-- [x] **Message Persistence** - In-memory storage with history
-- [x] **User Presence** - Track users per realm
-- [x] **Connection Status** - Visual indicators for connectivity
-- [x] **Message History** - Load recent messages on realm join
-- [x] **Realm Switching** - Seamless realm navigation
+### Real-time Chat
+- [x] Socket.IO realm-based messaging (Living, Beyond, Unknown)
+- [x] join_realm, send_message, receive_message events
+- [x] In-memory message history (per realm, 200 max)
+- [x] User presence tracking per realm
+- [x] Connection status indicators
+- [x] Message history on realm join
 
-### 🎭 Authentication System
-- [x] **Guest Login Model** - Username-based authentication
-- [x] **localStorage Persistence** - Session survives browser refresh
-- [x] **Auth Context** - React Context for auth state
-- [x] **Protected Routes** - Redirect to login if not authenticated
-- [x] **Logout Functionality** - Clear session and redirect
+### Authentication
+- [x] Guest login (username + localStorage)
+- [x] AuthContext with useAuth hook
+- [x] Protected routes (redirect to /login if unauthenticated)
+- [x] Logout functionality
 
-### 🔮 Ritual System
-- [x] **Centralized Registry** - RitualRegistry pattern
-- [x] **Daily Fortune Ritual** - Mystical fortune generation
-- [x] **Weather Omen Ritual** - City-based weather interpretation
-- [x] **Wheel of Fate Ritual** - Random destiny outcomes
-- [x] **Cooldown Management** - Prevent ritual spam
-- [x] **Result History** - Track ritual execution results
-- [x] **Error Handling** - Graceful failure management
+### Ritual System
+- [x] RitualRegistry pattern (centralized registry)
+- [x] Daily Fortune ritual + backend endpoint
+- [x] Weather Omen ritual + MCP bridge backend
+- [x] Wheel of Fate mini-game
+- [x] Cooldown management
+- [x] Ritual result history
+- [x] Effect triggers on ritual completion
 
-### 👻 Visual Effects System
-- [x] **Event-driven Architecture** - Decoupled effect triggering
-- [x] **Ghost Overlays** - Ethereal visual effects with particles
-- [x] **CRT Scanlines** - Retro terminal aesthetic
-- [x] **Glitch Text** - Dynamic text corruption effects
-- [x] **Effect Settings** - Toggleable visual effects
-- [x] **Intensity Levels** - Low, medium, high effect variations
-- [x] **Accessibility Support** - Respects prefers-reduced-motion
+### Visual Effects
+- [x] Event-driven EffectSystem
+- [x] GhostOverlay (particles, wisps, fade in/out)
+- [x] CRT scanline overlay
+- [x] GlitchText component
+- [x] EffectSettings panel (toggleable)
+- [x] Intensity levels (low/medium/high)
+- [x] prefers-reduced-motion support
 
-### 🔗 MCP Integration
-- [x] **Weather-Omen MCP Server** - External MCP server definition
-- [x] **Backend MCP Bridge** - REST API to MCP stdio transport
-- [x] **Error Handling** - Graceful MCP server failures
-- [x] **Status Monitoring** - MCP server health checks
-- [x] **Professional Documentation** - Removed "mock" references
+### MCP Integration
+- [x] Weather-Omen MCP server definition (.kiro/mcp/weather-omen/)
+- [x] Backend MCP bridge (GET /api/omens/weather)
+- [x] MCPStatus component
+- [x] Graceful fallback on MCP failure
 
-### 🛡️ Security & Performance
-- [x] **Input Validation** - Comprehensive sanitization
-  - [x] Username validation (max 20 chars)
-  - [x] Message validation (max 500 chars)
-  - [x] City validation (max 50 chars)
-  - [x] Realm validation (restricted values)
-- [x] **Rate Limiting** - Anti-spam protection
-  - [x] Chat messages (5 per 3 seconds)
-  - [x] Ritual execution (1 per 10 seconds)
-- [x] **Memory Management** - Message pagination (200 per realm)
-- [x] **Error Boundaries** - Comprehensive error handling
+### Security & Validation
+- [x] Input validation (username, message, city, realm)
+- [x] Rate limiting (5 messages / 3s per socket)
+- [x] Memory-capped message store
+- [x] CORS configured for localhost:5173
 
-### 📱 User Interface
-- [x] **Responsive Design** - Mobile-friendly interface
-- [x] **Dark Theme** - Green-on-black terminal styling
-- [x] **Component Library** - Reusable UI components
-- [x] **Loading States** - User feedback during operations
-- [x] **Error Messages** - User-friendly error display
-- [x] **Settings Panel** - Effect configuration interface
-
-### 📊 Monitoring & Analytics
-- [x] **Message Statistics** - `/api/messages/stats` endpoint
-- [x] **Memory Usage Tracking** - Real-time memory monitoring
-- [x] **Rate Limit Tracking** - Anti-spam statistics
-- [x] **Health Checks** - `/api/health` endpoint
-- [x] **Console Logging** - Comprehensive debug information
-
-### 📚 Documentation
-- [x] **README.md** - Complete project overview with architecture
-- [x] **architecture.md** - Deep technical documentation
-- [x] **plan.md** - 5-phase development roadmap
-- [x] **context.md** - Design decisions and rationale
-- [x] **Professional Tone** - Removed undermining language
-
-## 🔧 Bug Fixes & Improvements
-
-### Recent Fixes
-- [x] **TypeScript Import Issues** - Fixed type-only imports for EffectSystem
-- [x] **MCP Documentation** - Removed "conceptual" and "mocked" references
-- [x] **Input Validation** - Added comprehensive security validation
-- [x] **Rate Limiting** - Implemented anti-spam protection
-- [x] **Memory Safety** - Added message pagination and monitoring
-
-## 🚧 Known Issues (None Currently)
-
-*No known issues at this time. All major functionality is working correctly.*
-
-## 📋 Next Development Tasks
-
-### Phase 1: Foundation (Planned)
-- [ ] **Unit Tests** - Jest + React Testing Library
-- [ ] **Integration Tests** - API and Socket.IO testing
-- [ ] **E2E Tests** - Playwright end-to-end testing
-- [ ] **Database Integration** - PostgreSQL migration
-- [ ] **Performance Optimization** - Bundle splitting and lazy loading
-
-### Phase 2: Enhancement (Planned)
-- [ ] **User Profiles** - Avatar upload and preferences
-- [ ] **Message Features** - Reactions, threading, search
-- [ ] **Additional Rituals** - Tarot cards, crystal ball, runes
-- [ ] **Real MCP Integration** - Actual MCP server implementation
-- [ ] **Redis Caching** - Session and data caching
-
-### Phase 3: Social Features (Planned)
-- [ ] **Friend System** - Add/remove friends and messaging
-- [ ] **Guilds/Covens** - Group functionality
-- [ ] **Achievement System** - Gamification elements
-- [ ] **Mobile App** - React Native implementation
-
-## 🎯 Current Status: Production-Ready MVP
-
-The application is now a **production-ready MVP** with:
-- ✅ **Security hardening** with input validation and rate limiting
-- ✅ **Memory safety** with automatic pagination
-- ✅ **Professional documentation** without undermining language
-- ✅ **Comprehensive error handling** and monitoring
-- ✅ **Real-time functionality** with Socket.IO
-- ✅ **Immersive user experience** with visual effects
-
-## 📈 Quality Metrics
-
-### Code Quality
-- **TypeScript Coverage**: 100% (all files use TypeScript)
-- **Error Handling**: Comprehensive (all major paths covered)
-- **Input Validation**: Complete (all user inputs validated)
-- **Rate Limiting**: Implemented (chat and rituals protected)
-
-### Performance
-- **Memory Usage**: Monitored and capped
-- **Message Storage**: Paginated (200 per realm max)
-- **Real-time Latency**: < 100ms (Socket.IO optimized)
-- **Bundle Size**: Optimized with Vite
-
-### Security
-- **Input Sanitization**: All user inputs cleaned
-- **Rate Limiting**: Anti-spam protection active
-- **Error Messages**: No sensitive information leaked
-- **CORS Configuration**: Properly configured
+### Prophecies
+- [x] POST /api/prophecies + GET /api/prophecies
+- [x] Ominous language generator
+- [x] ProphecyCard frontend component
+- [x] GhostOverlay trigger on prophecy creation
 
 ---
 
-*This checklist is updated with each development task completion.*
-*Last updated: Current session*
+## 🚧 Phase 1: Persistent Storage + Real Auth
+
+### Database (PostgreSQL + NeonDB + Prisma)
+- [x] Set up NeonDB project and get connection string
+- [x] Install Prisma + adapter-neon in backend
+- [x] Define Prisma schema: User, Conversation, ConversationMember, Message, Prophecy
+- [x] Run initial migration (20260316_init applied to NeonDB)
+- [x] Prisma client singleton with Neon adapter (backend/lib/prisma.js)
+- [x] Prophecies route updated to use Prisma (with guest fallback)
+- [ ] Replace messageStore.js with Prisma message queries (in-memory still active as fallback)
+- [ ] Add database health check to /api/health
+
+### Real Authentication
+- [x] bcryptjs password hashing
+- [x] POST /api/auth/register (username, email, password) → JWT
+- [x] POST /api/auth/login → JWT
+- [x] GET /api/auth/me — token verification
+- [x] JWT middleware (backend/middleware/auth.js)
+- [x] useAuth.tsx updated — stores JWT + user object in localStorage
+- [x] Login.tsx updated — register/login toggle with real API calls
+- [x] services/api.ts — apiFetch helper with auto Authorization header
+- [ ] Protect Socket.IO connection with JWT handshake
+
+---
+
+## 🚧 Phase 2: Conversations (DMs + Group Rooms)
+
+### Backend
+- [ ] GET /api/conversations — list user's conversations
+- [ ] POST /api/conversations — create DM or group room
+- [ ] GET /api/conversations/:id/messages — paginated history
+- [ ] POST /api/conversations/:id/members — add member to group
+- [ ] Socket.IO rooms mapped to conversationId (not just realm name)
+- [ ] typing_start / typing_stop events per conversation
+- [ ] online_users event per conversation
+
+### Frontend
+- [ ] Sidebar: show DMs + group rooms + realm channels
+- [ ] ConversationList component
+- [ ] DMConversation view
+- [ ] GroupRoom view
+- [ ] Typing indicator component
+- [ ] Online users list per conversation
+- [ ] Create conversation modal (DM or group)
+
+---
+
+## 🚧 Phase 3: ASCII GIF System
+
+### ASCII GIF Player
+- [ ] AsciiGifPlayer component (frames: string[], frameDelay: number)
+- [ ] useInterval hook for frame cycling
+- [ ] Loop mode toggle
+- [ ] Pause/play controls
+
+### ASCII GIF Creator
+- [ ] AsciiGifCreator component
+- [ ] Multi-frame textarea editor (add/remove frames)
+- [ ] Frame delay slider
+- [ ] Live preview using AsciiGifPlayer
+- [ ] Save GIF to database (POST /api/ascii-gifs)
+- [ ] Load saved GIFs (GET /api/ascii-gifs)
+
+### Video-to-ASCII Pipeline
+- [ ] Backend: POST /api/ascii-gifs/convert (accepts video upload)
+- [ ] Extract frames using ffmpeg or canvas
+- [ ] Resize frames to target resolution (e.g. 80x40)
+- [ ] Map pixel brightness to ASCII chars: `@#%*+=-:. `
+- [ ] Optional: colored ASCII using styled spans (RGB from pixel)
+- [ ] Return frame array + suggested frameDelay
+
+### Message Integration
+- [ ] ascii_gif message type in Message schema
+- [ ] Render AsciiGifPlayer inline in ChatWindow for ascii_gif messages
+- [ ] Send ASCII GIF button in MessageInput
+
+---
+
+## 🚧 Phase 4: Messaging Polish
+
+- [ ] Message reactions (emoji, stored in DB)
+- [ ] Message search (GET /api/conversations/:id/messages?q=)
+- [ ] Message pagination (cursor-based, load older messages on scroll)
+- [ ] Virtual scrolling for large message lists
+- [ ] Sound effects (ritual completion, new message)
+- [ ] Unread message count per conversation
+
+---
+
+## 🚧 Phase 5: Additional Rituals + MCP Expansion
+
+- [ ] Tarot card reading ritual
+- [ ] Crystal ball ritual
+- [ ] Rune casting ritual
+- [ ] Real weather API in MCP server (replace mock)
+- [ ] Astrology MCP server
+- [ ] Ritual results shareable as messages
+
+---
+
+*Last updated: Production planning phase*

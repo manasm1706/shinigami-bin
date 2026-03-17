@@ -1,45 +1,63 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+
+interface User {
+  id: string;
+  username: string;
+  email: string;
+}
 
 interface AuthContextType {
   isAuthenticated: boolean;
   username: string | null;
-  login: (username: string) => void;
+  user: User | null;
+  token: string | null;
+  login: (token: string, user: User) => void;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-interface AuthProviderProps {
-  children: ReactNode;
-}
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [token, setToken] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [username, setUsername] = useState<string | null>(null);
-
-  // Check for existing session on mount
   useEffect(() => {
-    const savedUsername = localStorage.getItem('shinigami_username');
-    if (savedUsername) {
-      setUsername(savedUsername);
-      setIsAuthenticated(true);
+    const savedToken = localStorage.getItem('shinigami_token');
+    const savedUser = localStorage.getItem('shinigami_user');
+    if (savedToken && savedUser) {
+      try {
+        setToken(savedToken);
+        setUser(JSON.parse(savedUser));
+      } catch {
+        localStorage.removeItem('shinigami_token');
+        localStorage.removeItem('shinigami_user');
+      }
     }
   }, []);
 
-  const login = (newUsername: string) => {
-    setUsername(newUsername);
-    setIsAuthenticated(true);
-    localStorage.setItem('shinigami_username', newUsername);
+  const login = (newToken: string, newUser: User) => {
+    setToken(newToken);
+    setUser(newUser);
+    localStorage.setItem('shinigami_token', newToken);
+    localStorage.setItem('shinigami_user', JSON.stringify(newUser));
   };
 
   const logout = () => {
-    setUsername(null);
-    setIsAuthenticated(false);
-    localStorage.removeItem('shinigami_username');
+    setToken(null);
+    setUser(null);
+    localStorage.removeItem('shinigami_token');
+    localStorage.removeItem('shinigami_user');
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, username, login, logout }}>
+    <AuthContext.Provider value={{
+      isAuthenticated: !!token,
+      username: user?.username ?? null,
+      user,
+      token,
+      login,
+      logout
+    }}>
       {children}
     </AuthContext.Provider>
   );
@@ -47,8 +65,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
+  if (!context) throw new Error('useAuth must be used within an AuthProvider');
   return context;
 };

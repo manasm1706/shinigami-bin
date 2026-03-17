@@ -5,6 +5,7 @@ import { EffectSettingsProvider } from '../effects';
 import Layout from './Layout/Layout';
 import { Login } from '../auth';
 import { ChatPage } from '../chat';
+import LandingPage from './LandingPage/LandingPage';
 
 const Router: React.FC = () => {
   return (
@@ -12,17 +13,16 @@ const Router: React.FC = () => {
       <AuthProvider>
         <EffectSettingsProvider>
           <Routes>
-            {/* Public routes */}
+            <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<Login />} />
-            
+
             {/* Protected routes with layout */}
-            <Route path="/" element={<Layout />}>
+            <Route path="/app" element={<Layout />}>
               <Route path="chat" element={<ChatPage />} />
-              <Route index element={<Navigate to="/chat" replace />} />
+              <Route index element={<Navigate to="/app/chat" replace />} />
             </Route>
-            
-            {/* Catch all - redirect to chat */}
-            <Route path="*" element={<Navigate to="/chat" replace />} />
+
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </EffectSettingsProvider>
       </AuthProvider>

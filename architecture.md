@@ -2,391 +2,325 @@
 
 ## System Overview
 
-Shinigami-bin is built as a modern web application with a clear separation between frontend, backend, and external services. The architecture emphasizes real-time communication, modular design, and extensibility.
+Shinigami-bin is a supernatural-themed real-time messaging platform. The architecture is built around three pillars: real-time communication via Socket.IO, a modular ritual/feature system, and an event-driven visual effects engine. The UI aesthetic (green-on-black terminal, CRT effects, glitch text) is intentional and permanent.
+
+---
 
 ## Frontend Architecture
 
-### Technology Stack
-- **React 19** - UI framework with hooks and functional components
-- **TypeScript** - Type safety and developer experience
-- **Vite** - Fast build tool and development server
-- **Socket.IO Client** - Real-time communication
-- **React Router** - Client-side routing
+### Stack
+- React 19 + TypeScript + Vite
+- Socket.IO Client
+- React Router v6
 
 ### Directory Structure
 ```
 frontend/src/
-├── app/                    # Application shell
-│   ├── App.tsx            # Root component (legacy)
-│   ├── Router.tsx         # Route configuration
-│   └── Layout/            # Main layout wrapper
-├── auth/                  # Authentication system
-│   ├── Login/             # Login component
-│   └── useAuth.tsx        # Auth hook and context
-├── chat/                  # Real-time messaging
-│   ├── ChatPage.tsx       # Main chat interface
-│   ├── useChat.ts         # Socket.IO integration
-│   └── components/        # Chat UI components
-├── rituals/               # Fortune telling system
-│   ├── RitualRegistry.ts  # Central ritual management
-│   ├── useRituals.ts      # Ritual execution hook
-│   ├── rituals/           # Individual ritual implementations
-│   └── components/        # Ritual UI components
-├── effects/               # Visual effects system
-│   ├── EffectSystem.ts    # Event-based effect engine
-│   ├── GhostOverlay/      # Ethereal visual effects
-│   ├── CRTOverlay/        # Retro terminal effects
-│   └── GlitchText/        # Text corruption effects
-├── services/              # API communication
-│   ├── api.ts             # Base API configuration
-│   ├── messages.ts        # Chat API calls
-│   ├── fortune.ts         # Fortune API calls
-│   └── weatherOmen.ts     # Weather omen API calls
-└── types/                 # TypeScript definitions
+├── app/              # Router, Layout, App shell
+├── auth/             # Login, useAuth, AuthContext
+├── chat/             # ChatPage, useChat, ChatWindow, MessageInput, Sidebar
+├── rituals/          # RitualRegistry, useRituals, FortuneCard, WeatherOmenCard, WheelOfFate
+├── effects/          # EffectSystem, GhostOverlay, CRTOverlay, GlitchText, useEffects
+├── services/         # api.ts, messages.ts, fortune.ts, weatherOmen.ts, prophecies.ts
+└── types/            # Shared TypeScript types
 ```
 
-### Component Architecture
+### State Management
+- Local state: `useState` for component-specific data
+- Global state: React Context (AuthContext, EffectSettingsContext)
+- Real-time state: `useChat` hook (Socket.IO events → React state)
+- No Redux — Context + custom hooks is sufficient
 
-#### Atomic Design Principles
-- **Atoms**: Basic UI elements (buttons, inputs, text)
-- **Molecules**: Simple component combinations (message item, ritual card)
-- **Organisms**: Complex UI sections (chat window, ritual executor)
-- **Templates**: Page layouts (main layout, chat layout)
-- **Pages**: Route components (chat page, login page)
-
-#### State Management
-- **Local State**: React useState for component-specific data
-- **Context API**: Auth state, effect settings
-- **Custom Hooks**: Business logic abstraction (useChat, useRituals, useEffects)
-- **No Redux**: Kept simple with React's built-in state management
-
-### Real-time Communication
-
-#### Socket.IO Integration
-```typescript
-// useChat hook manages Socket.IO connection
-const { messages, users, isConnected, joinRealm, sendMessage } = useChat();
-
-// Event handling
-socket.on('receive_message', handleReceiveMessage);
-socket.on('realm_history', handleRealmHistory);
-socket.on('user_joined', handleUserJoined);
+### Routing
+```
+/login   → Login (public)
+/        → redirect to /chat
+/chat    → ChatPage (protected, wrapped in Layout)
+*        → redirect to /chat
 ```
 
-#### Message Flow
-1. User types message → `sendMessage()` called
-2. Hook emits `send_message` event to server
-3. Server broadcasts to all realm users
-4. All clients receive `receive_message` event
-5. Messages state updated → UI re-renders
+---
 
 ## Backend Architecture
 
-### Technology Stack
-- **Node.js** - JavaScript runtime
-- **Express** - Web framework
-- **Socket.IO** - Real-time communication
-- **CORS** - Cross-origin resource sharing
+### Stack
+- Node.js + Express
+- Socket.IO
+- Prisma ORM (planned, currently in-memory)
+- PostgreSQL on NeonDB (planned)
 
 ### Directory Structure
 ```
 backend/
-├── index.js               # Main server file
-├── routes/                # REST API endpoints
-│   ├── messages.js        # Chat API (legacy)
-│   ├── fortune.js         # Fortune telling API
-│   ├── omens.js          # Weather omen API (MCP bridge)
-│   └── prophecies.js     # Prophecy API
-├── data/                  # Data layer
-│   ├── messageStore.js    # In-memory message storage
-│   ├── store.js          # General data store
-│   └── prophecies.js     # Prophecy data
-└── utils/                 # Utility functions
-    ├── fortunes.js       # Fortune generation
-    └── validation.js     # Input validation
+├── index.js           # Express + Socket.IO server
+├── routes/
+│   ├── messages.js    # Legacy REST (to be replaced by conversation routes)
+│   ├── fortune.js     # GET /api/fortune/daily
+│   ├── omens.js       # GET /api/omens/weather (MCP bridge)
+│   └── prophecies.js  # POST/GET /api/prophecies
+├── data/
+│   ├── messageStore.js  # In-memory (to be replaced by Prisma)
+│   └── prophecies.js    # In-memory (to be replaced by Prisma)
+└── utils/
+    ├── fortunes.js      # Fortune text generation
+    ├── validation.js    # Input validation helpers
+    └── inputValidation.js
 ```
 
-### API Design
-
-#### REST Endpoints
+### REST API
 ```
-GET  /api/health           # Health check
-GET  /api/fortune/daily    # Daily fortune
-GET  /api/omens/weather    # Weather omen (MCP bridge)
-GET  /api/prophecies       # List prophecies
-POST /api/prophecies       # Create prophecy
-GET  /api/messages/stats   # Message statistics
+GET  /api/health
+GET  /api/fortune/daily?username=NAME
+GET  /api/omens/weather?city=CITY
+GET  /api/prophecies
+POST /api/prophecies
+
+# Planned (Phase 1-2):
+POST /api/auth/register
+POST /api/auth/login
+GET  /api/conversations
+POST /api/conversations
+GET  /api/conversations/:id/messages
+POST /api/conversations/:id/members
+
+# Planned (Phase 3):
+POST /api/ascii-gifs/convert
+GET  /api/ascii-gifs
+POST /api/ascii-gifs
 ```
 
-#### Socket.IO Events
+### Socket.IO Events
 ```
 Client → Server:
-- join_realm(realm, username)
-- send_message(realm, sender, text)
+  join_realm(realm, username)         # current
+  send_message(realm, sender, text)   # current
+  join_conversation(conversationId)   # planned
+  send_message_v2(conversationId, content, type)  # planned
+  typing_start(conversationId)        # planned
+  typing_stop(conversationId)         # planned
 
 Server → Client:
-- receive_message(message)
-- realm_history(realm, messages)
-- user_joined(username, realm)
-- user_left(username, realm)
-- realm_users(realm, users)
+  receive_message(message)
+  realm_history(realm, messages)
+  user_joined(username, realm)
+  user_left(username, realm)
+  realm_users(realm, users)
+  typing(conversationId, username)    # planned
+  online_users(conversationId, users) # planned
 ```
 
-### Data Storage
+---
 
-#### In-Memory Storage
-```javascript
-// Message storage per realm
-const messageStore = {
-  messages: Map<realm, Message[]>,
-  maxMessagesPerRealm: 100,
-  addMessage(message),
-  getRecentMessages(realm, limit)
-};
+## Database Schema (Prisma — Phase 1)
 
-// User tracking per realm
-const realmUsers = Map<realm, User[]>;
+```prisma
+model User {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  messages     Message[]
+  memberships  ConversationMember[]
+}
+
+model Conversation {
+  id        String   @id @default(cuid())
+  type      String   // "dm" | "group" | "realm"
+  name      String?
+  realmId   String?
+  createdAt DateTime @default(now())
+  members   ConversationMember[]
+  messages  Message[]
+}
+
+model ConversationMember {
+  id             String       @id @default(cuid())
+  userId         String
+  conversationId String
+  joinedAt       DateTime     @default(now())
+  user           User         @relation(fields: [userId], references: [id])
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+}
+
+model Message {
+  id             String   @id @default(cuid())
+  conversationId String
+  senderId       String
+  content        String
+  type           String   @default("text") // "text" | "ascii_gif"
+  createdAt      DateTime @default(now())
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  sender         User         @relation(fields: [senderId], references: [id])
+}
+
+model AsciiGif {
+  id         String   @id @default(cuid())
+  creatorId  String
+  frames     String[] // array of ASCII frame strings
+  frameDelay Int      @default(150)
+  width      Int
+  height     Int
+  createdAt  DateTime @default(now())
+}
 ```
 
-#### Database Migration Path
-The current in-memory storage is designed for easy migration to persistent storage:
-
-```javascript
-// Current: In-memory
-messageStore.addMessage(message);
-
-// Future: Database
-await db.messages.create(message);
-```
+---
 
 ## Effect System Architecture
 
 ### Event-Driven Design
-The effect system uses an event-driven architecture to decouple visual effects from business logic:
+Effects are completely decoupled from business logic. Rituals emit events; UI components listen.
 
 ```typescript
-// Effect triggering (from ritual completion)
+// Trigger (from ritual completion)
 effectSystem.triggerEffect('ghost_dramatic', { ritualType: 'wheel_of_fate' });
 
-// Effect listening (in UI components)
+// Listen (in UI component)
 useEffect(() => {
-  const cleanup = addListener('ghost_dramatic', handleGhostEffect);
-  return cleanup;
+  return addListener('ghost_dramatic', (payload) => setGhostActive(true));
 }, []);
 ```
 
-### Effect Types
-- **Ghost Overlays**: Ethereal visual effects with particles and wisps
-- **CRT Effects**: Scanlines, flicker, and screen curvature
-- **Glitch Text**: Dynamic text corruption with color separation
-- **Future**: Screen shake, particle bursts, sound effects
+### Effect → Ritual Mapping
+| Ritual | Effect | Duration | Intensity |
+|--------|--------|----------|-----------|
+| Fortune | ghost_subtle | 1.5s | low |
+| Weather Omen | ghost_medium | 2.5s | medium |
+| Wheel of Fate | ghost_dramatic | 4s | high + vortex |
 
-### Settings Management
-```typescript
-interface EffectSettings {
-  crtOverlay: { enabled: boolean; intensity: 'low' | 'medium' | 'high' };
-  glitchText: { enabled: boolean; intensity: 'low' | 'medium' | 'high'; trigger: 'hover' | 'continuous' | 'random' };
-  ghostEffects: { enabled: boolean };
-}
-```
+### Effect Types
+- `GhostOverlay` — particles, wisps, fade in/out
+- `CRTOverlay` — scanlines, flicker, screen curvature
+- `GlitchText` — text corruption with color channel separation
+- All effects are toggleable via EffectSettings
+
+---
 
 ## Ritual System Architecture
 
 ### Registry Pattern
-The ritual system uses a centralized registry for managing and executing rituals:
-
 ```typescript
 class RitualRegistry {
-  private rituals = Map<string, RitualDefinition>();
-  
-  register(ritual: RitualDefinition): void;
-  execute(ritualId: string, params?: any): Promise<RitualResult>;
-  isOnCooldown(ritualId: string): boolean;
+  register(ritual: RitualDefinition): void
+  execute(id: string, params?: unknown): Promise<RitualResult>
+  isOnCooldown(id: string): boolean
+  getHistory(): RitualResult[]
+}
+
+interface RitualDefinition {
+  id: string
+  name: string
+  cooldown?: number
+  requiredParams?: string[]
+  execute(params?: unknown): Promise<RitualResult>
 }
 ```
 
-### Ritual Lifecycle
-1. **Registration**: Rituals register themselves with the registry
-2. **Validation**: Parameters validated before execution
-3. **Execution**: Ritual function called with parameters
-4. **Cooldown**: Execution time recorded for cooldown management
-5. **Effects**: Success triggers appropriate visual effects
-6. **History**: Results stored for debugging and analytics
-
-### Extensibility
-Adding new rituals is straightforward:
-
+### Adding a New Ritual
 ```typescript
-const newRitual: RitualDefinition = {
+ritualRegistry.register({
   id: 'tarot_reading',
   name: 'Tarot Reading',
-  category: 'divination',
-  cooldown: 120000, // 2 minutes
-  async execute(params) {
-    // Ritual implementation
-    return { success: true, data: { cards: [...] } };
+  cooldown: 120_000,
+  async execute() {
+    const cards = drawCards(3);
+    return { success: true, data: { cards } };
   }
-};
-
-ritualRegistry.register(newRitual);
+});
 ```
+
+---
 
 ## MCP Integration Architecture
 
 ### Bridge Pattern
-The backend acts as a bridge between the frontend and MCP servers:
+```
+Frontend → REST API → Backend MCP Bridge → MCP Server (stdio) → External API
+```
 
-```
-Frontend → Backend API → MCP Server → External APIs
-         ←             ←            ←
-```
+The backend is the only layer that communicates with MCP servers. The frontend calls a normal REST endpoint.
 
 ### MCP Server Communication
 ```javascript
-// Conceptual MCP integration (currently mocked)
+// Where real MCP integration goes (currently mocked in omens.js)
 const { Client } = require('@modelcontextprotocol/sdk/client');
 const { StdioClientTransport } = require('@modelcontextprotocol/sdk/client/stdio');
 
-async function callMCPServer(toolName, params) {
-  const transport = new StdioClientTransport({
-    command: 'node',
-    args: ['./.kiro/mcp/weather-omen/index.js']
-  });
-  
-  const client = new Client({ name: 'shinigami-backend' });
-  await client.connect(transport);
-  
-  const result = await client.request({
-    method: 'tools/call',
-    params: { name: toolName, arguments: params }
-  });
-  
-  await client.close();
-  return result;
+const transport = new StdioClientTransport({
+  command: 'node',
+  args: ['./.kiro/mcp/weather-omen/index.js']
+});
+const client = new Client({ name: 'shinigami-backend' });
+await client.connect(transport);
+const result = await client.request({
+  method: 'tools/call',
+  params: { name: 'get_weather_omen', arguments: { city } }
+});
+```
+
+---
+
+## ASCII GIF Pipeline (Phase 3)
+
+```
+Video Upload → Frame Extraction → Resize → Brightness Map → ASCII Frames → Store/Send
+```
+
+### Brightness-to-ASCII Mapping
+```javascript
+const ASCII_CHARS = '@#%*+=-:. ';
+// pixel brightness 0-255 → index into ASCII_CHARS
+const char = ASCII_CHARS[Math.floor((brightness / 255) * (ASCII_CHARS.length - 1))];
+```
+
+### Colored ASCII (optional)
+```html
+<!-- Each char wrapped in a span with the original pixel color -->
+<span style="color: rgb(120, 80, 200)">@</span>
+```
+
+### AsciiGifPlayer Component
+```tsx
+interface AsciiGifPlayerProps {
+  frames: string[]
+  frameDelay: number
+  loop?: boolean
 }
+// Uses useInterval to cycle frames, renders current frame in <pre>
 ```
 
-### Error Handling
-- **Graceful Degradation**: Fallback to mock data if MCP server unavailable
-- **User Feedback**: Clear error messages for connection issues
-- **Retry Logic**: Automatic retries with exponential backoff
-- **Status Monitoring**: Health checks and connection status
+---
 
-## Security Considerations
+## Security
 
-### Current Security Measures
-- **CORS Configuration**: Restricts cross-origin requests
-- **Input Validation**: Basic parameter validation
-- **Rate Limiting**: Ritual cooldowns prevent spam
-- **No Sensitive Data**: Guest-only authentication model
+### Current
+- Input validation on all user inputs (username, message, city, realm)
+- Rate limiting: 5 messages / 3s per socket
+- CORS restricted to localhost:5173
+- Memory-capped message store (200 per realm)
 
-### Future Security Enhancements
-- **Authentication**: JWT tokens for user sessions
-- **Authorization**: Role-based access control
-- **Input Sanitization**: XSS and injection prevention
-- **Rate Limiting**: API endpoint protection
-- **HTTPS**: Encrypted communication
-- **CSP Headers**: Content Security Policy
+### Planned (Phase 1)
+- bcrypt password hashing
+- JWT authentication (access tokens)
+- JWT middleware on protected routes
+- Socket.IO handshake auth (JWT in socket.handshake.auth)
+- Refresh token rotation
 
-## Performance Considerations
+---
 
-### Current Optimizations
-- **In-Memory Storage**: Fast message retrieval
-- **Connection Pooling**: Socket.IO connection reuse
-- **Event Debouncing**: Prevents excessive effect triggering
-- **Lazy Loading**: Components loaded on demand
+## Deployment (Future)
 
-### Scalability Challenges
-- **Memory Usage**: In-memory storage doesn't scale
-- **Single Server**: No horizontal scaling
-- **No Caching**: Repeated API calls
-- **No CDN**: Static assets served from origin
-
-### Future Performance Improvements
-- **Database**: Persistent storage with indexing
-- **Redis**: Caching and session storage
-- **Load Balancing**: Multiple server instances
-- **CDN**: Static asset distribution
-- **Message Pagination**: Limit message loading
-- **Virtual Scrolling**: Handle large message lists
-
-## Deployment Architecture
-
-### Current Deployment
-- **Development**: Local servers (frontend + backend)
-- **No Production**: Demo/development only
-
-### Recommended Production Setup
 ```
-Internet → Load Balancer → Web Servers → Database
-                       → Socket.IO Servers → Redis
-                       → MCP Servers
+Internet → Load Balancer → Express + Socket.IO servers
+                        → NeonDB (PostgreSQL)
+                        → Redis (sessions, presence, rate limits)
 ```
 
-### Infrastructure Components
-- **Web Servers**: Multiple Node.js instances
-- **Database**: PostgreSQL with read replicas
-- **Cache**: Redis for sessions and frequent data
-- **Message Queue**: For background processing
-- **Monitoring**: Application and infrastructure metrics
-- **Logging**: Centralized log aggregation
+- Socket.IO sticky sessions required for horizontal scaling
+- Redis adapter for Socket.IO when running multiple instances
+- NeonDB handles connection pooling at the DB layer
 
-## Testing Strategy
+---
 
-### Current Testing
-- **Manual Testing**: Developer verification
-- **No Automated Tests**: Technical debt
-
-### Recommended Testing Pyramid
-```
-E2E Tests (Few)
-├── Integration Tests (Some)
-├── Unit Tests (Many)
-└── Static Analysis (TypeScript, ESLint)
-```
-
-### Test Categories
-- **Unit Tests**: Individual functions and components
-- **Integration Tests**: API endpoints and Socket.IO events
-- **E2E Tests**: Complete user workflows
-- **Performance Tests**: Load testing and benchmarks
-- **Security Tests**: Vulnerability scanning
-
-## Monitoring and Observability
-
-### Current Monitoring
-- **Console Logs**: Basic debugging information
-- **No Metrics**: No performance monitoring
-- **No Alerting**: No automated notifications
-
-### Recommended Observability Stack
-- **Metrics**: Application and business metrics
-- **Logging**: Structured logging with correlation IDs
-- **Tracing**: Distributed request tracing
-- **Alerting**: Automated incident detection
-- **Dashboards**: Real-time system visibility
-
-### Key Metrics to Track
-- **User Metrics**: Active users, session duration
-- **Message Metrics**: Messages per second, delivery latency
-- **Ritual Metrics**: Execution success rate, response time
-- **System Metrics**: CPU, memory, network usage
-- **Error Metrics**: Error rates, failure patterns
-
-## Conclusion
-
-The Shinigami-bin architecture balances simplicity with extensibility. The modular design allows for easy feature additions while maintaining clear separation of concerns. The real-time communication layer provides immediate feedback, and the effect system creates an immersive user experience.
-
-Key architectural strengths:
-- **Modular Design**: Clear separation between chat, rituals, and effects
-- **Real-time Communication**: Socket.IO for instant messaging
-- **Extensible Ritual System**: Easy to add new fortune-telling features
-- **Event-Driven Effects**: Decoupled visual feedback system
-- **Type Safety**: TypeScript throughout the application
-
-Areas for improvement:
-- **Persistent Storage**: Replace in-memory storage
-- **Authentication**: Move beyond guest-only model
-- **Testing**: Add comprehensive test coverage
-- **Performance**: Optimize for scale
-- **Security**: Implement production-grade security measures
+*Last updated: Production planning phase*

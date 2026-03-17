@@ -1,183 +1,93 @@
 const express = require('express');
 const router = express.Router();
-const { 
-  addProphecy, 
-  getAllProphecies, 
-  getPropheciesByDateRange,
-  deleteProphecy 
-} = require('../data/prophecies');
+const prisma = require('../lib/prisma');
+const { generateOminousProphecy } = require('../data/prophecies');
+const { optionalAuth } = require('../middleware/auth');
 
-/**
- * Validate prophecy data
- */
 function validateProphecy({ title, date }) {
   const errors = [];
-
-  // Validate title
-  if (!title) {
-    errors.push('Title is required');
-  } else if (typeof title !== 'string') {
-    errors.push('Title must be a string');
-  } else if (title.trim().length === 0) {
-    errors.push('Title cannot be empty');
-  } else if (title.trim().length > 200) {
-    errors.push('Title must be 200 characters or less');
-  }
-
-  // Validate date
-  if (!date) {
-    errors.push('Date is required');
-  } else {
-    const parsedDate = new Date(date);
-    if (isNaN(parsedDate.getTime())) {
-      errors.push('Date must be a valid ISO 8601 date string');
-    }
-  }
-
-  return {
-    valid: errors.length === 0,
-    errors
-  };
+  if (!title || typeof title !== 'string' || title.trim().length === 0) errors.push('Title is required');
+  if (title && title.trim().length > 200) errors.push('Title must be 200 characters or less');
+  if (!date || isNaN(new Date(date).getTime())) errors.push('Valid date required');
+  return errors;
 }
 
-// POST /api/prophecies - Create a new prophecy
-router.post('/', (req, res) => {
+// POST /api/prophecies
+router.post('/', optionalAuth, async (req, res) => {
   try {
     const { title, date } = req.body;
+    const errors = validateProphecy({ title, date });
+    if (errors.length) return res.status(400).json({ error: errors[0] });
 
-    // Validate prophecy data
-    const validation = validateProphecy({ title, date });
-    if (!validation.valid) {
-      return res.status(400).json({ 
-        error: 'Validation failed',
-        details: validation.errors 
+    const ominousData = generateOminousProphecy(title, date);
+
+    // If authenticated, store in DB; otherwise return ephemeral prophecy
+    if (req.user) {
+      const prophecy = await prisma.prophecy.create({
+        data: {
+          userId: req.user.id,
+          title: title.trim(),
+          date: new Date(date),
+          ominousTitle: ominousData.ominousTitle,
+          ominousDescription: ominousData.ominousDescription,
+          severity: ominousData.severity
+        }
+      });
+      return res.status(201).json({
+        success: true,
+        prophecy,
+        message: 'The prophecy has been inscribed in the cosmic ledger'
       });
     }
 
-    // Create prophecy
-    const newProphecy = addProphecy({ title, date });
-
-    res.status(201).json({
-      success: true,
-      prophecy: newProphecy,
-      message: 'The prophecy has been inscribed in the cosmic ledger'
-    });
-
-  } catch (error) {
-    console.error('Error creating prophecy:', error);
-    res.status(500).json({ 
-      error: 'Failed to inscribe prophecy',
-      details: error.message 
-    });
+    // Guest fallback — ephemeral, not persisted
+    const prophecy = {
+      id: Date.now().toString(),
+      title: title.trim(),
+      date: new Date(date).toISOString(),
+      ...ominousData,
+      createdAt: new Date().toISOString()
+    };
+    res.status(201).json({ success: true, prophecy, message: 'The prophecy has been inscribed in the cosmic ledger' });
+  } catch (err) {
+    console.error('Prophecy create error:', err);
+    res.status(500).json({ error: 'Failed to inscribe prophecy' });
   }
 });
 
-// GET /api/prophecies - Get all prophecies or filter by date range
-router.get('/', (req, res) => {
+// GET /api/prophecies
+router.get('/', optionalAuth, async (req, res) => {
   try {
-    const { startDate, endDate } = req.query;
-
-    let prophecies;
-    
-    if (startDate && endDate) {
-      // Validate date range
-      const start = new Date(startDate);
-      const end = new Date(endDate);
-      
-      if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-        return res.status(400).json({
-          error: 'Invalid date format. Use ISO 8601 format (YYYY-MM-DDTHH:mm:ss.sssZ)'
-        });
-      }
-      
-      if (start > end) {
-        return res.status(400).json({
-          error: 'Start date must be before end date'
-        });
-      }
-      
-      prophecies = getPropheciesByDateRange(startDate, endDate);
-    } else {
-      prophecies = getAllProphecies();
-    }
-
-    res.json({
-      count: prophecies.length,
-      prophecies,
-      message: prophecies.length > 0 
-        ? 'The cosmic calendar reveals its secrets' 
-        : 'The future remains unwritten... for now'
-    });
-
-  } catch (error) {
-    console.error('Error fetching prophecies:', error);
-    res.status(500).json({ 
-      error: 'Failed to consult the cosmic calendar',
-      details: error.message 
-    });
-  }
-});
-
-// DELETE /api/prophecies/:id - Delete a prophecy
-router.delete('/:id', (req, res) => {
-  try {
-    const { id } = req.params;
-
-    if (!id) {
-      return res.status(400).json({
-        error: 'Prophecy ID is required'
+    if (req.user) {
+      const prophecies = await prisma.prophecy.findMany({
+        where: { userId: req.user.id },
+        orderBy: { date: 'asc' }
       });
+      return res.json({ count: prophecies.length, prophecies });
     }
-
-    const deletedProphecy = deleteProphecy(id);
-
-    if (!deletedProphecy) {
-      return res.status(404).json({
-        error: 'Prophecy not found in the cosmic ledger'
-      });
-    }
-
-    res.json({
-      success: true,
-      prophecy: deletedProphecy,
-      message: 'The prophecy has been erased from the timeline'
-    });
-
-  } catch (error) {
-    console.error('Error deleting prophecy:', error);
-    res.status(500).json({ 
-      error: 'Failed to alter the cosmic ledger',
-      details: error.message 
-    });
+    // Guest — return empty
+    res.json({ count: 0, prophecies: [], message: 'Sign in to persist your prophecies across the void' });
+  } catch (err) {
+    console.error('Prophecy fetch error:', err);
+    res.status(500).json({ error: 'Failed to consult the cosmic calendar' });
   }
 });
 
-// GET /api/prophecies/upcoming - Get upcoming prophecies (next 7 days)
-router.get('/upcoming', (req, res) => {
+// DELETE /api/prophecies/:id
+router.delete('/:id', optionalAuth, async (req, res) => {
   try {
-    const now = new Date();
-    const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-    
-    const upcomingProphecies = getPropheciesByDateRange(
-      now.toISOString(), 
-      nextWeek.toISOString()
-    );
+    if (!req.user) return res.status(401).json({ error: 'Authentication required' });
 
-    res.json({
-      count: upcomingProphecies.length,
-      prophecies: upcomingProphecies,
-      timeframe: 'next 7 days',
-      message: upcomingProphecies.length > 0 
-        ? 'The immediate future stirs with foretold events' 
-        : 'The coming days hold no recorded prophecies... yet'
+    const prophecy = await prisma.prophecy.findFirst({
+      where: { id: req.params.id, userId: req.user.id }
     });
+    if (!prophecy) return res.status(404).json({ error: 'Prophecy not found in the cosmic ledger' });
 
-  } catch (error) {
-    console.error('Error fetching upcoming prophecies:', error);
-    res.status(500).json({ 
-      error: 'Failed to peer into the immediate future',
-      details: error.message 
-    });
+    await prisma.prophecy.delete({ where: { id: req.params.id } });
+    res.json({ success: true, message: 'The prophecy has been erased from the timeline' });
+  } catch (err) {
+    console.error('Prophecy delete error:', err);
+    res.status(500).json({ error: 'Failed to alter the cosmic ledger' });
   }
 });
 

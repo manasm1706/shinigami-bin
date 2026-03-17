@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { createServer } = require('http');
@@ -127,7 +128,7 @@ io.on('connection', (socket) => {
   });
 
   // Handle sending messages
-  socket.on('send_message', ({ realm, sender, text }) => {
+  socket.on('send_message', async ({ realm, sender, text, conversationId }) => {
     // Rate limiting: Max 5 messages per 3 seconds
     const messageRateKey = `msg_${socket.id}`;
     if (!checkRateLimit(messageRateKey, 5, 3000)) {
@@ -168,8 +169,25 @@ io.on('connection', (socket) => {
       timestamp: new Date().toISOString()
     };
 
-    // Store message in memory
+    // Store in memory (always works)
     messageStore.addMessage(message);
+
+    // Persist to DB if we have a conversationId and authenticated user
+    if (conversationId && socket.userId) {
+      try {
+        const prisma = require('./lib/prisma');
+        await prisma.message.create({
+          data: {
+            conversationId,
+            senderId: socket.userId,
+            content: validatedText,
+            type: 'text'
+          }
+        });
+      } catch (dbErr) {
+        console.warn('⚠️ DB message persist failed (in-memory fallback active):', dbErr.message);
+      }
+    }
 
     console.log(`💬 Message in ${validatedRealm}: ${validatedSender}: ${validatedText}`);
     
@@ -203,6 +221,7 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
+app.use('/api/auth', require('./routes/auth'));
 app.use('/api/messages', messagesRouter);
 app.use('/api/fortune', fortuneRouter);
 app.use('/api/omens', require('./routes/omens'));
