@@ -1,104 +1,131 @@
 .sidebar {
-  width: 250px;
+  width: 220px;
+  min-width: 220px;
   background: #0a0a0a;
   border-right: 2px solid #00ff41;
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100%;
   font-family: 'Courier New', monospace;
   box-shadow: inset 0 0 20px rgba(0, 255, 65, 0.1);
+  overflow: hidden;
 }
 
-.sidebar-header {
-  padding: 20px;
-  border-bottom: 2px solid #00ff41;
-  background: linear-gradient(180deg, #0f0f0f 0%, #0a0a0a 100%);
-}
-
-.app-title {
-  font-size: 24px;
-  color: #00ff41;
-  margin: 0;
-  text-shadow: 0 0 10px #00ff41, 0 0 20px #00ff41;
-  letter-spacing: 2px;
-}
-
-.subtitle {
-  font-size: 10px;
-  color: #00aa33;
-  margin-top: 5px;
-  letter-spacing: 3px;
-}
-
-.realm-list {
+.sidebar-nav {
   flex: 1;
   overflow-y: auto;
-  padding: 10px 0;
+  padding: 8px 0;
+  min-height: 0;
 }
 
-.realm-list-header {
-  padding: 15px 20px 10px;
+.nav-section-header {
+  padding: 12px 16px 6px;
   color: #00aa33;
-  font-size: 12px;
+  font-size: 11px;
   letter-spacing: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.realm-item {
+.section-action {
+  background: transparent;
+  border: 1px solid #00aa33;
+  color: #00aa33;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+  transition: all 0.2s;
+}
+
+.section-action:hover:not(:disabled) {
+  border-color: #00ff41;
+  color: #00ff41;
+  box-shadow: 0 0 5px rgba(0, 255, 65, 0.4);
+}
+
+.section-action:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.nav-item {
   width: 100%;
-  padding: 12px 20px;
+  padding: 10px 16px;
   background: transparent;
   border: none;
   color: #00ff41;
   text-align: left;
   cursor: pointer;
   font-family: 'Courier New', monospace;
-  font-size: 14px;
+  font-size: 13px;
   transition: all 0.2s;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   border-left: 3px solid transparent;
 }
 
-.realm-item:hover {
+.nav-item:hover {
   background: rgba(0, 255, 65, 0.1);
   border-left-color: #00ff41;
 }
 
-.realm-item:disabled {
-  opacity: 0.5;
+.nav-item:disabled {
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
-.realm-item:disabled:hover {
+.nav-item:disabled:hover {
   background: transparent;
   border-left-color: transparent;
 }
 
-.realm-item.active {
+.nav-item.active {
   background: rgba(0, 255, 65, 0.2);
   border-left-color: #00ff41;
-  box-shadow: inset 0 0 10px rgba(0, 255, 65, 0.2);
+  box-shadow: inset 0 0 10px rgba(0, 255, 65, 0.15);
 }
 
-.realm-icon {
-  font-size: 12px;
+.nav-icon {
+  font-size: 11px;
+  flex-shrink: 0;
 }
 
-.realm-name {
+.nav-name {
   flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .user-count {
   font-size: 10px;
   color: #00aa33;
   opacity: 0.8;
+  flex-shrink: 0;
+}
+
+.nav-empty {
+  padding: 4px 16px 8px 38px;
+  font-size: 11px;
+  color: #00aa33;
+  opacity: 0.5;
+  font-style: italic;
 }
 
 .sidebar-footer {
-  padding: 15px 20px;
+  padding: 12px 16px;
   border-top: 2px solid #00ff41;
   background: #0f0f0f;
+  flex-shrink: 0;
 }
 
 .status-line {
@@ -110,24 +137,17 @@
   gap: 5px;
 }
 
-.status-line.connected {
-  color: #00ff41;
-}
-
-.status-line.disconnected {
-  color: #ff4444;
-}
+.status-line.connected { color: #00ff41; }
+.status-line.disconnected { color: #ff4444; }
 
 .realm-info {
-  margin-top: 8px;
+  margin-top: 6px;
   font-size: 10px;
   color: #00aa33;
   opacity: 0.8;
 }
 
-.crt-text {
-  letter-spacing: 1px;
-}
+.crt-text { letter-spacing: 1px; }
 
 .crt-flicker {
   animation: flicker 3s infinite;
@@ -136,4 +156,103 @@
 @keyframes flicker {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.8; }
+}
+
+/* Scrollbar */
+.sidebar-nav::-webkit-scrollbar { width: 4px; }
+.sidebar-nav::-webkit-scrollbar-track { background: transparent; }
+.sidebar-nav::-webkit-scrollbar-thumb { background: #00aa33; border-radius: 2px; }
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal {
+  background: #0a0a0a;
+  border: 2px solid #00ff41;
+  padding: 24px;
+  min-width: 300px;
+  font-family: 'Courier New', monospace;
+  box-shadow: 0 0 30px rgba(0, 255, 65, 0.3);
+}
+
+.modal-header {
+  color: #00ff41;
+  font-size: 13px;
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+  text-shadow: 0 0 5px #00ff41;
+}
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modal-label {
+  color: #00aa33;
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+
+.modal-input {
+  background: rgba(0, 255, 65, 0.05);
+  border: 1px solid #00aa33;
+  color: #00ff41;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  padding: 8px 10px;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.modal-input:focus {
+  border-color: #00ff41;
+  box-shadow: 0 0 8px rgba(0, 255, 65, 0.3);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.modal-btn {
+  flex: 1;
+  padding: 8px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  border: 2px solid;
+  background: transparent;
+  transition: all 0.2s;
+}
+
+.modal-btn-confirm {
+  border-color: #00ff41;
+  color: #00ff41;
+}
+
+.modal-btn-confirm:hover {
+  background: rgba(0, 255, 65, 0.2);
+  box-shadow: 0 0 10px rgba(0, 255, 65, 0.4);
+}
+
+.modal-btn-cancel {
+  border-color: #ff4444;
+  color: #ff4444;
+}
+
+.modal-btn-cancel:hover {
+  background: rgba(255, 68, 68, 0.15);
 }

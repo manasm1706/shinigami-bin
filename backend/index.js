@@ -3,9 +3,11 @@ const express = require('express');
 const cors = require('cors');
 const { createServer } = require('http');
 const { Server } = require('socket.io');
+const jwt = require('jsonwebtoken');
 const messagesRouter = require('./routes/messages');
 const fortuneRouter = require('./routes/fortune');
 const messageStore = require('./data/messageStore');
+const { getAllRealmConfigs } = require('./data/realmConfig');
 const { validateUsername, validateMessage, validateRealm } = require('./utils/inputValidation');
 
 const app = express();
@@ -67,12 +69,27 @@ setInterval(() => {
   }
 }, 5 * 60 * 1000);
 
+// Socket.IO JWT middleware — attaches socket.userId if token valid
+io.use((socket, next) => {
+  const token = socket.handshake.auth?.token;
+  if (token) {
+    try {
+      const payload = jwt.verify(token, process.env.JWT_SECRET);
+      socket.userId = payload.sub;
+      socket.username = payload.username;
+    } catch {
+      // Invalid token — allow as guest, userId stays undefined
+    }
+  }
+  next();
+});
+
 // Socket.IO connection handling
 io.on('connection', (socket) => {
   console.log(`👻 User connected: ${socket.id}`);
 
   // Join a realm
-  socket.on('join_realm', ({ realm, username }) => {
+  socket.on('join_realm', async ({ realm, username }) => {
     // Validate inputs
     const realmValidation = validateRealm(realm);
     if (!realmValidation.valid) {
@@ -117,7 +134,37 @@ io.on('connection', (socket) => {
     console.log(`🌟 ${validatedUsername} joined realm: ${validatedRealm}`);
     
     // Send recent messages to the joining user
-    const recentMessages = messageStore.getRecentMessages(validatedRealm, 20);
+    let recentMessages = messageStore.getRecentMessages(validatedRealm, 20);
+
+    // Try to load from DB if user is authenticated
+    if (socket.userId) {
+      try {
+        const prisma = require('./lib/prisma');
+        const conv = await prisma.conversation.findFirst({
+          where: { type: 'realm', realmId: validatedRealm }
+        });
+        if (conv) {
+          const dbMessages = await prisma.message.findMany({
+            where: { conversationId: conv.id },
+            orderBy: { createdAt: 'asc' },
+            take: 20,
+            include: { sender: { select: { username: true } } }
+          });
+          if (dbMessages.length > 0) {
+            recentMessages = dbMessages.map(m => ({
+              id: m.id,
+              sender: m.sender.username,
+              text: m.content,
+              realm: validatedRealm,
+              timestamp: m.createdAt.toISOString()
+            }));
+          }
+        }
+      } catch (dbErr) {
+        console.warn('⚠️ DB history load failed (in-memory fallback):', dbErr.message);
+      }
+    }
+
     socket.emit('realm_history', { realm: validatedRealm, messages: recentMessages });
     
     // Notify others in the realm
@@ -128,7 +175,7 @@ io.on('connection', (socket) => {
   });
 
   // Handle sending messages
-  socket.on('send_message', async ({ realm, sender, text, conversationId }) => {
+  socket.on('send_message', async ({ realm, sender, text, clientId }) => {
     // Rate limiting: Max 5 messages per 3 seconds
     const messageRateKey = `msg_${socket.id}`;
     if (!checkRateLimit(messageRateKey, 5, 3000)) {
@@ -163,27 +210,39 @@ io.on('connection', (socket) => {
 
     const message = {
       id: Date.now().toString(),
+      clientId: clientId || null,
       sender: validatedSender,
       text: validatedText,
       realm: validatedRealm,
       timestamp: new Date().toISOString()
     };
 
-    // Store in memory (always works)
+    // Always store in-memory as fallback
     messageStore.addMessage(message);
 
-    // Persist to DB if we have a conversationId and authenticated user
-    if (conversationId && socket.userId) {
+    // Persist to DB if authenticated user — find or create realm conversation
+    if (socket.userId) {
       try {
         const prisma = require('./lib/prisma');
+        // Find or create the realm conversation
+        let conv = await prisma.conversation.findFirst({
+          where: { type: 'realm', realmId: validatedRealm }
+        });
+        if (!conv) {
+          conv = await prisma.conversation.create({
+            data: { type: 'realm', realmId: validatedRealm, name: validatedRealm }
+          });
+        }
         await prisma.message.create({
           data: {
-            conversationId,
+            conversationId: conv.id,
             senderId: socket.userId,
             content: validatedText,
             type: 'text'
           }
         });
+        // Update message id to DB id for consistency
+        message.id = `db_${conv.id}_${Date.now()}`;
       } catch (dbErr) {
         console.warn('⚠️ DB message persist failed (in-memory fallback active):', dbErr.message);
       }
@@ -193,6 +252,35 @@ io.on('connection', (socket) => {
     
     // Broadcast to all users in the realm (including sender)
     io.to(`realm_${validatedRealm}`).emit('receive_message', message);
+
+    // Acknowledge delivery to the sender
+    if (message.clientId) {
+      socket.emit('message_ack', { clientId: message.clientId, id: message.id });
+    }
+  });
+
+  // Typing indicators (conversation-scoped)
+  socket.on('typing_start', ({ conversationId }) => {
+    if (!conversationId || !socket.username) return;
+    socket.to(`conversation_${conversationId}`).emit('typing', {
+      conversationId,
+      username: socket.username
+    });
+  });
+
+  socket.on('typing_stop', ({ conversationId }) => {
+    if (!conversationId || !socket.username) return;
+    socket.to(`conversation_${conversationId}`).emit('typing_stopped', {
+      conversationId,
+      username: socket.username
+    });
+  });
+
+  // Join a conversation room (DM / group)
+  socket.on('join_conversation', ({ conversationId }) => {
+    if (!conversationId) return;
+    socket.join(`conversation_${conversationId}`);
+    console.log(`💬 Socket ${socket.id} joined conversation: ${conversationId}`);
   });
 
   // Handle disconnection
@@ -226,14 +314,29 @@ app.use('/api/messages', messagesRouter);
 app.use('/api/fortune', fortuneRouter);
 app.use('/api/omens', require('./routes/omens'));
 app.use('/api/prophecies', require('./routes/prophecies'));
+app.use('/api/conversations', require('./routes/conversations'));
 
 // Health check
-app.get('/api/health', (req, res) => {
+app.get('/api/health', async (req, res) => {
+  let dbStatus = 'unknown';
+  try {
+    const prisma = require('./lib/prisma');
+    await prisma.$queryRaw`SELECT 1`;
+    dbStatus = 'connected';
+  } catch {
+    dbStatus = 'unavailable';
+  }
   res.json({ 
     status: 'alive',
     service: 'Shinigami-bin API',
+    db: dbStatus,
     timestamp: new Date().toISOString()
   });
+});
+
+// Realm configurations
+app.get('/api/realms', (req, res) => {
+  res.json(getAllRealmConfigs());
 });
 
 // Message store statistics (for debugging)

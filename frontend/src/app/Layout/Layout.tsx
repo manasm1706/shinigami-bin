@@ -34,6 +34,7 @@ const Layout: React.FC = () => {
         </div>
         
         <div className="header-right">
+          <EffectSettingsPanel className="header-effects-panel" />
           <div className="user-info">
             <span className="user-label">SOUL:</span>
             <GlitchText 
@@ -63,9 +64,6 @@ const Layout: React.FC = () => {
       
       {/* Global effect overlay - listens for effect events */}
       {settings.ghostEffects.enabled && <EffectGhostOverlay />}
-      
-      {/* Effect settings panel */}
-      <EffectSettingsPanel />
     </div>
   );
 };

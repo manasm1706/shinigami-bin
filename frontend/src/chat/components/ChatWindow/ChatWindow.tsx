@@ -1,14 +1,17 @@
 import React, { useEffect, useRef } from 'react';
 import './ChatWindow.css';
-import type { Realm } from '../../../types';
+import TypingIndicator from '../TypingIndicator/TypingIndicator';
+import type { RealmConfig } from '../../../types';
 import type { ChatMessage } from '../../useChat';
 
 interface ChatWindowProps {
   messages: ChatMessage[];
-  activeRealm: Realm | null;
+  activeRealm: RealmConfig | null;
   loading?: boolean;
   error?: string | null;
   isConnected?: boolean;
+  typingUsers?: string[];
+  currentUsername?: string;
 }
 
 const ChatWindow: React.FC<ChatWindowProps> = ({ 
@@ -16,7 +19,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   activeRealm, 
   loading = false, 
   error = null,
-  isConnected = false
+  isConnected = false,
+  typingUsers = [],
+  currentUsername
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -92,11 +97,22 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
                 <span className="message-time">{formatTime(message.timestamp)}</span>
               </div>
               <div className="message-content">{message.text}</div>
+              {currentUsername && message.sender === currentUsername && message.status && (
+                <div className="message-status">
+                  <span
+                    className={`status-icon ${message.status}`}
+                    title={message.status}
+                  >
+                    {message.status === 'delivered' ? '●' : '○'}
+                  </span>
+                </div>
+              )}
             </div>
           ))
         )}
         <div ref={messagesEndRef} />
       </div>
+      <TypingIndicator typingUsers={typingUsers} />
     </div>
   );
 };

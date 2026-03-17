@@ -12,6 +12,31 @@
   backdrop-filter: blur(10px);
 }
 
+/* When placed inside the header, override fixed positioning */
+.header-effects-panel {
+  position: relative;
+  top: auto;
+  right: auto;
+  background: transparent;
+  border: 2px solid #00aa33;
+  border-radius: 4px;
+  min-width: unset;
+  backdrop-filter: none;
+}
+
+.header-effects-panel .settings-content {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: rgba(0, 0, 0, 0.95);
+  border: 2px solid #00aa33;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  min-width: 220px;
+  z-index: 9998;
+  backdrop-filter: blur(10px);
+}
+
 .settings-toggle {
   display: flex;
   align-items: center;

@@ -19,6 +19,10 @@ The UI aesthetic (green-on-black, CRT scanlines, glitch text, ghost overlays) is
 - Feature-based frontend architecture
 - React Router (/login, /chat)
 - Input validation + rate limiting
+- Realm behavior metadata system (effectsLevel, allowRituals, type)
+- `GET /api/realms` endpoint exposing realm configs
+- `useRealmEffects` hook — adjusts effect intensity per realm
+- `useRituals(allowRituals)` — gates ritual execution per realm
 
 ### What's In-Memory (needs DB)
 - Messages (per realm, 200 max)
@@ -63,11 +67,19 @@ The AuthContext interface will expand but the hook API (`useAuth()`) stays the s
 
 ### 7. Conversation Model
 Moving from realm-only to three conversation types:
-- `realm` — open channels (Living, Beyond, Unknown), auto-created
+- `realm` — open channels (Living, Beyond, Unknown), auto-created, treated as system conversations
 - `dm` — private 1:1 between two users
 - `group` — user-created named room with membership
 
-Socket.IO rooms will be mapped to `conversation_${id}` instead of `realm_${name}`.
+Socket.IO rooms will be mapped to `conversation_${id}` instead of `realm_${name}`. Realms are seeded as default system conversations.
+
+### 11. Realm Behavior System
+Realms are no longer just Socket.IO room partitions. Each realm carries metadata:
+- `type`: `social` | `experimental` | `system`
+- `effectsLevel`: `low` | `medium` | `high` — drives ghost/glitch intensity
+- `allowRituals`: boolean — gates ritual execution
+
+The effect system listens for `realm_effects_changed` events and adapts accordingly. The ritual system checks `allowRituals` before executing. UI layout does not change — only behavior adapts.
 
 ### 8. ASCII GIF System
 A creative feature unique to this platform. Three parts:

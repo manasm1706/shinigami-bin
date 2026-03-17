@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import React, { createContext, useContext, useState, type ReactNode } from 'react';
 
 interface User {
   id: string;
@@ -18,22 +18,16 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [token, setToken] = useState<string | null>(null);
-  const [user, setUser] = useState<User | null>(null);
-
-  useEffect(() => {
-    const savedToken = localStorage.getItem('shinigami_token');
-    const savedUser = localStorage.getItem('shinigami_user');
-    if (savedToken && savedUser) {
-      try {
-        setToken(savedToken);
-        setUser(JSON.parse(savedUser));
-      } catch {
-        localStorage.removeItem('shinigami_token');
-        localStorage.removeItem('shinigami_user');
-      }
+  // Read synchronously so username is never blank on first render
+  const [token, setToken] = useState<string | null>(() => localStorage.getItem('shinigami_token'));
+  const [user, setUser] = useState<User | null>(() => {
+    try {
+      const saved = localStorage.getItem('shinigami_user');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
     }
-  }, []);
+  });
 
   const login = (newToken: string, newUser: User) => {
     setToken(newToken);

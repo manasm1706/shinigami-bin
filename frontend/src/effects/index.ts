@@ -12,6 +12,7 @@ export { default as EffectSettingsPanel } from './EffectSettings/EffectSettingsP
 // Effect system core
 export { effectSystem, EffectTypes } from './EffectSystem';
 export { useEffects } from './useEffects';
+export { useRealmEffects } from './useRealmEffects';
 export { ritualEffectMapper, completeRitualWithEffects } from './RitualEffectMapper';
 
 // Types

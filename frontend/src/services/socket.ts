@@ -7,12 +7,14 @@ class SocketService {
 
   connect(): Socket {
     if (!this.socket) {
+      const token = localStorage.getItem('shinigami_token');
       this.socket = io(SOCKET_URL, {
         autoConnect: true,
         reconnection: true,
         reconnectionDelay: 1000,
         reconnectionAttempts: 5,
-        maxReconnectionAttempts: 5
+        maxReconnectionAttempts: 5,
+        auth: token ? { token } : {}
       });
 
       this.socket.on('connect', () => {

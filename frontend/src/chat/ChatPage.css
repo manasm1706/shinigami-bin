@@ -4,6 +4,7 @@
   width: 100%;
   background: #000;
   position: relative;
+  overflow: hidden;
 }
 
 .chat-main {
@@ -11,15 +12,73 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  min-width: 0;
 }
 
-/* Responsive Design */
+/* Ritual side panel */
+.ritual-panel {
+  width: 380px;
+  min-width: 380px;
+  border-left: 2px solid #00ff41;
+  background: #050505;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  position: relative;
+  padding: 16px;
+  box-shadow: inset 0 0 20px rgba(0, 255, 65, 0.05);
+}
+
+/* Green scrollbar — only on the ritual panel */
+.ritual-panel::-webkit-scrollbar {
+  width: 6px;
+}
+.ritual-panel::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+.ritual-panel::-webkit-scrollbar-thumb {
+  background: #00ff41;
+  border-radius: 3px;
+}
+.ritual-panel::-webkit-scrollbar-thumb:hover {
+  background: #00aa33;
+}
+
+.ritual-panel-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  border: 1px solid #00aa33;
+  color: #00aa33;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: all 0.2s;
+  z-index: 10;
+}
+
+.ritual-panel-close:hover {
+  border-color: #ff4444;
+  color: #ff4444;
+}
+
 @media (max-width: 768px) {
   .chat-page {
     flex-direction: column;
   }
-  
-  .chat-main {
-    flex: 1;
+
+  .ritual-panel {
+    width: 100%;
+    min-width: unset;
+    border-left: none;
+    border-top: 2px solid #00ff41;
+    max-height: 50vh;
   }
 }

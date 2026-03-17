@@ -167,7 +167,45 @@ model AsciiGif {
 
 ---
 
-## Effect System Architecture
+## Realm System Architecture
+
+### Realm as Behavior-Driven Environment
+Realms are no longer simple Socket.IO room partitions. Each realm is a configurable entity:
+
+```typescript
+interface RealmConfig {
+  id: string;
+  name: string;
+  description: string;
+  type: 'social' | 'experimental' | 'system';
+  effectsLevel: 'low' | 'medium' | 'high';
+  allowRituals: boolean;
+}
+```
+
+| Realm   | type         | effectsLevel | allowRituals |
+|---------|--------------|--------------|--------------|
+| Living  | social       | low          | false        |
+| Beyond  | experimental | high         | true         |
+| Unknown | system       | medium       | false        |
+
+### Realm → Effect Integration
+`useRealmEffects(effectsLevel)` fires a `realm_effects_changed` event on the EffectSystem when the active realm changes. Effect components can listen and adapt intensity.
+
+### Realm → Ritual Integration
+`useRituals(allowRituals)` blocks `execute()` calls when `allowRituals` is false, returning a structured error result.
+
+### Conversation Architecture
+Realms are treated as default system conversations. The unified conversation model supports:
+- `realm` — system-level open channels (Living, Beyond, Unknown)
+- `group` — user-created group chats
+- `dm` — private 1:1 conversations
+
+Socket.IO rooms: current `realm_${name}` (backward compatible), future `conversation_${id}`.
+
+---
+
+
 
 ### Event-Driven Design
 Effects are completely decoupled from business logic. Rituals emit events; UI components listen.

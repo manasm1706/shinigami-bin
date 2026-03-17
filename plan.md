@@ -15,6 +15,39 @@ All storage is in-memory. Auth is guest-only. Conversations are realm-only (no D
 
 ---
 
+## Phase 0.5: Realm Behavior System (in progress)
+
+Goal: Upgrade realms from simple Socket.IO room partitions into behavior-driven environments.
+
+### Realm Metadata Model
+Each realm now carries:
+- `id` — unique identifier
+- `name` — display name
+- `type` — `social` | `experimental` | `system`
+- `effectsLevel` — `low` | `medium` | `high`
+- `allowRituals` — boolean
+- `description` — flavor text
+
+### Realm Behaviors
+| Realm   | Type         | effectsLevel | allowRituals | Purpose                                      |
+|---------|--------------|--------------|--------------|----------------------------------------------|
+| Living  | social       | low          | false        | Default chat, minimal effects, normal comms  |
+| Beyond  | experimental | high         | true         | Playground: full rituals, strong effects     |
+| Unknown | system       | medium       | false        | System/bot space, experimental features      |
+
+### Changes Made
+- `RealmConfig` type added to `frontend/src/types/index.ts` (replaces bare `Realm`)
+- `useRealmEffects(effectsLevel)` hook — broadcasts `realm_effects_changed` event when realm switches
+- `useRituals(allowRituals)` — blocks ritual execution when `allowRituals: false`
+- `backend/data/realmConfig.js` — single source of truth for realm metadata
+- `GET /api/realms` — exposes realm configs to frontend
+- `ChatPage` wires `useRealmEffects` to active realm's `effectsLevel`
+
+### Conversation Architecture (foundation)
+Realms are treated as default system conversations. The Socket.IO room naming (`realm_${id}`) is preserved for backward compatibility. Future conversation types (DMs, groups) will use `conversation_${id}` rooms.
+
+---
+
 ## Phase 1: Persistent Storage + Real Auth (v0.3.0)
 
 Goal: Replace in-memory storage with PostgreSQL via Prisma. Add real signup/login with JWT.
@@ -84,6 +117,9 @@ Goal: Evolve from realm-only chat to full DM + group room + realm channel system
 - `dm` — private 1:1 conversation between two users
 - `group` — user-created room with named membership
 
+### Unified Conversation Model
+All conversation types map to a single `Conversation` model. Socket.IO rooms use `conversation_${conversationId}`. Realms are seeded as system conversations on startup.
+
 ### Socket.IO Changes
 - Rooms mapped to `conversation_${conversationId}` instead of `realm_${name}`
 - New events:
@@ -116,7 +152,6 @@ Goal: Let users create and share animated ASCII art inside chats.
 
 **AsciiGifPlayer**
 ```tsx
-// Takes frames and loops them at frameDelay ms
 <AsciiGifPlayer frames={['frame1', 'frame2']} frameDelay={150} loop />
 ```
 
@@ -133,23 +168,11 @@ POST /api/ascii-gifs/convert
   → { frames: string[], frameDelay: number, width: number, height: number }
 ```
 
-Pipeline steps:
-1. Extract frames (ffmpeg or canvas API)
-2. Resize to target resolution (e.g. 80×40 chars)
-3. Map pixel brightness → ASCII char from `@#%*+=-:. `
-4. Optional: wrap chars in `<span style="color: rgb(r,g,b)">` for colored output
-5. Return frame array
-
-### Message Integration
-- `type: "ascii_gif"` in Message schema
-- ChatWindow renders `<AsciiGifPlayer>` for ascii_gif messages
-- MessageInput has "Insert ASCII GIF" button
-
 ---
 
 ## Phase 4: Messaging Polish (v0.6.0)
 
-- Message reactions (emoji, stored in DB as Reaction model)
+- Message reactions (emoji, stored in DB)
 - Message search (full-text, per conversation)
 - Cursor-based pagination for message history
 - Virtual scrolling in ChatWindow
@@ -160,12 +183,12 @@ Pipeline steps:
 
 ## Phase 5: Additional Rituals + Real MCP (v0.7.0)
 
-- Tarot card reading ritual (virtual deck, 3-card spread)
-- Crystal ball ritual (vision generation)
-- Rune casting ritual (Norse rune system)
-- Real weather API in MCP server (replace mock fetch)
+- Tarot card reading ritual
+- Crystal ball ritual
+- Rune casting ritual
+- Real weather API in MCP server (replace mock)
+- Astrology MCP server
 - Ritual results shareable as chat messages
-- Astrology MCP server (optional)
 
 ---
 
@@ -174,10 +197,11 @@ Pipeline steps:
 - UI aesthetic stays unchanged — supernatural terminal style is intentional
 - Ritual system stays modular (registry pattern, pluggable execute())
 - Effects stay decoupled from business logic (event-driven EffectSystem)
+- Realm behavior is driven by metadata, not hardcoded conditionals
 - MCP bridge stays in backend — frontend never calls MCP directly
 - Socket.IO stays event-driven — no REST polling for real-time data
 - `import type` for all TypeScript interface imports (verbatimModuleSyntax)
 
 ---
 
-*Last updated: Production planning phase*
+*Last updated: Phase 0.5 — Realm Behavior System*

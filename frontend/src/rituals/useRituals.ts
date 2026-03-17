@@ -14,7 +14,7 @@ export interface UseRitualsReturn {
   getHistory: (ritualId: string) => RitualResult[];
 }
 
-export const useRituals = (): UseRitualsReturn => {
+export const useRituals = (allowRituals: boolean = true): UseRitualsReturn => {
   const [rituals, setRituals] = useState<RitualDefinition[]>([]);
   const [isExecuting, setIsExecuting] = useState(false);
   const [lastResult, setLastResult] = useState<RitualResult | null>(null);
@@ -26,6 +26,20 @@ export const useRituals = (): UseRitualsReturn => {
   }, []);
 
   const executeRitual = useCallback(async (ritualId: string, params?: any): Promise<RitualResult> => {
+    if (!allowRituals) {
+      const blocked: RitualResult = {
+        id: `blocked_${Date.now()}`,
+        type: ritualId,
+        success: false,
+        data: null,
+        timestamp: new Date().toISOString(),
+        error: 'Rituals are not permitted in this realm.'
+      };
+      setError(blocked.error!);
+      setLastResult(blocked);
+      return blocked;
+    }
+
     setIsExecuting(true);
     setError(null);
     

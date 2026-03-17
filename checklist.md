@@ -59,6 +59,15 @@
 - [x] ProphecyCard frontend component
 - [x] GhostOverlay trigger on prophecy creation
 
+### Realm Behavior System
+- [x] `RealmConfig` type with `type`, `effectsLevel`, `allowRituals` fields
+- [x] `backend/data/realmConfig.js` — single source of truth for realm metadata
+- [x] `GET /api/realms` — exposes realm configs to frontend
+- [x] `useRealmEffects(effectsLevel)` hook — broadcasts realm effect level changes
+- [x] `useRituals(allowRituals)` — blocks ritual execution in non-ritual realms
+- [x] `ChatPage` wires active realm metadata to effect and ritual systems
+- [x] `EffectSystem` extended with `realm_effects_changed` event type
+
 ---
 
 ## 🚧 Phase 1: Persistent Storage + Real Auth
@@ -70,8 +79,8 @@
 - [x] Run initial migration (20260316_init applied to NeonDB)
 - [x] Prisma client singleton with Neon adapter (backend/lib/prisma.js)
 - [x] Prophecies route updated to use Prisma (with guest fallback)
-- [ ] Replace messageStore.js with Prisma message queries (in-memory still active as fallback)
-- [ ] Add database health check to /api/health
+- [x] Replace messageStore.js with Prisma message queries (in-memory still active as fallback)
+- [x] Add database health check to /api/health
 
 ### Real Authentication
 - [x] bcryptjs password hashing
@@ -82,29 +91,29 @@
 - [x] useAuth.tsx updated — stores JWT + user object in localStorage
 - [x] Login.tsx updated — register/login toggle with real API calls
 - [x] services/api.ts — apiFetch helper with auto Authorization header
-- [ ] Protect Socket.IO connection with JWT handshake
+- [x] Protect Socket.IO connection with JWT handshake
 
 ---
 
 ## 🚧 Phase 2: Conversations (DMs + Group Rooms)
 
 ### Backend
-- [ ] GET /api/conversations — list user's conversations
-- [ ] POST /api/conversations — create DM or group room
-- [ ] GET /api/conversations/:id/messages — paginated history
-- [ ] POST /api/conversations/:id/members — add member to group
+- [x] GET /api/conversations — list user's conversations
+- [x] POST /api/conversations — create DM or group room
+- [x] GET /api/conversations/:id/messages — paginated history
+- [x] POST /api/conversations/:id/members — add member to group
 - [ ] Socket.IO rooms mapped to conversationId (not just realm name)
-- [ ] typing_start / typing_stop events per conversation
-- [ ] online_users event per conversation
+- [x] typing_start / typing_stop events per conversation
+- [x] online_users event per conversation
 
 ### Frontend
-- [ ] Sidebar: show DMs + group rooms + realm channels
-- [ ] ConversationList component
+- [x] Sidebar: show DMs + group rooms + realm channels
+- [x] ConversationList component (integrated into Sidebar)
 - [ ] DMConversation view
 - [ ] GroupRoom view
-- [ ] Typing indicator component
+- [x] Typing indicator component
 - [ ] Online users list per conversation
-- [ ] Create conversation modal (DM or group)
+- [x] Create conversation modal (group)
 
 ---
 
