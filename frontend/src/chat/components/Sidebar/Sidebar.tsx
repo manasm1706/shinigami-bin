@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './Sidebar.css';
 import type { RealmConfig, Conversation } from '../../../types';
 
-type RitualPanel = 'fortune' | 'wheel' | 'weather' | null;
+type RitualPanel = 'fortune' | 'wheel' | 'weather' | 'tarot' | 'crystal' | 'runes' | null;
 
 interface SidebarProps {
   realms: RealmConfig[];
@@ -16,6 +16,7 @@ interface SidebarProps {
   userCount?: number;
   activeRitualPanel: RitualPanel;
   onRitualToggle: (panel: RitualPanel) => void;
+  unreadCounts?: Record<string, number>;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -30,6 +31,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   userCount = 0,
   activeRitualPanel,
   onRitualToggle,
+  unreadCounts = {},
 }) => {
   const [showGroupModal, setShowGroupModal] = useState(false);
   const [groupName, setGroupName] = useState('');
@@ -90,6 +92,9 @@ const Sidebar: React.FC<SidebarProps> = ({
           >
             <span className="nav-icon">◈</span>
             <span className="nav-name">{conv.name ?? 'Unnamed'}</span>
+            {(unreadCounts[conv.id] ?? 0) > 0 && (
+              <span className="unread-badge">{unreadCounts[conv.id]}</span>
+            )}
           </button>
         ))}
 
@@ -108,6 +113,9 @@ const Sidebar: React.FC<SidebarProps> = ({
           >
             <span className="nav-icon">◇</span>
             <span className="nav-name">{conv.name ?? 'Unknown'}</span>
+            {(unreadCounts[conv.id] ?? 0) > 0 && (
+              <span className="unread-badge">{unreadCounts[conv.id]}</span>
+            )}
           </button>
         ))}
 
@@ -135,6 +143,27 @@ const Sidebar: React.FC<SidebarProps> = ({
         >
           <span className="nav-icon">🌩</span>
           <span className="nav-name">Weather Omens</span>
+        </button>
+        <button
+          className={`nav-item ${activeRitualPanel === 'tarot' ? 'active' : ''}`}
+          onClick={() => onRitualToggle('tarot')}
+        >
+          <span className="nav-icon">🃏</span>
+          <span className="nav-name">Tarot Reading</span>
+        </button>
+        <button
+          className={`nav-item ${activeRitualPanel === 'crystal' ? 'active' : ''}`}
+          onClick={() => onRitualToggle('crystal')}
+        >
+          <span className="nav-icon">🔮</span>
+          <span className="nav-name">Crystal Ball</span>
+        </button>
+        <button
+          className={`nav-item ${activeRitualPanel === 'runes' ? 'active' : ''}`}
+          onClick={() => onRitualToggle('runes')}
+        >
+          <span className="nav-icon">ᚱ</span>
+          <span className="nav-name">Rune Casting</span>
         </button>
       </nav>
 

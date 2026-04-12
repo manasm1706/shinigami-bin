@@ -299,3 +299,134 @@
   color: #00ff41;
   opacity: 0.9;
 }
+
+/* Search bar */
+.chat-header-bottom {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0, 255, 65, 0.05);
+  border: 1px solid #003311;
+  padding: 4px 8px;
+  flex: 1;
+  max-width: 280px;
+}
+
+.search-icon {
+  color: #00aa33;
+  font-size: 14px;
+}
+
+.search-input {
+  background: transparent;
+  border: none;
+  color: #00ff41;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  outline: none;
+  flex: 1;
+  min-width: 0;
+}
+
+.search-input::placeholder { color: #00aa33; opacity: 0.5; }
+
+.search-clear {
+  background: transparent;
+  border: none;
+  color: #555;
+  cursor: pointer;
+  font-size: 11px;
+  padding: 0;
+  line-height: 1;
+  transition: color 0.15s;
+}
+.search-clear:hover { color: #ff4444; }
+
+/* Load more */
+.load-more-indicator {
+  text-align: center;
+  color: #00aa33;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  padding: 8px;
+  opacity: 0.7;
+  animation: pulse 1.5s infinite;
+}
+
+/* Reactions */
+.react-btn {
+  background: transparent;
+  border: none;
+  color: #00aa33;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0 4px;
+  opacity: 0.6;
+  transition: opacity 0.15s;
+  margin-left: auto;
+}
+.react-btn:hover { opacity: 1; }
+
+.message-reactions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.reaction-chip {
+  background: rgba(0, 255, 65, 0.08);
+  border: 1px solid #003311;
+  color: #00ff41;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  padding: 2px 7px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s;
+  border-radius: 2px;
+}
+.reaction-chip:hover {
+  border-color: #00ff41;
+  background: rgba(0, 255, 65, 0.15);
+}
+
+.reaction-count {
+  font-size: 10px;
+  color: #00aa33;
+}
+
+.emoji-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+  padding: 6px;
+  background: #0a0a0a;
+  border: 1px solid #00aa33;
+  width: fit-content;
+}
+
+.emoji-option {
+  background: transparent;
+  border: 1px solid transparent;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 3px 5px;
+  border-radius: 2px;
+  transition: all 0.1s;
+  line-height: 1;
+}
+.emoji-option:hover {
+  border-color: #00ff41;
+  background: rgba(0, 255, 65, 0.1);
+}

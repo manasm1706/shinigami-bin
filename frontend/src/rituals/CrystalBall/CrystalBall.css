@@ -1,0 +1,167 @@
+.crystal-ball-ritual {
+  background: linear-gradient(135deg, #0a0a0a 0%, #0a0a1a 100%);
+  border: 3px solid #9b59b6;
+  padding: 20px;
+  font-family: 'Courier New', monospace;
+  box-shadow: 0 0 20px rgba(155, 89, 182, 0.3), inset 0 0 30px rgba(155, 89, 182, 0.05);
+}
+
+.crystal-header { border-color: #9b59b6; }
+.crystal-header .ritual-icon { color: #9b59b6; text-shadow: 0 0 10px #9b59b6; }
+.crystal-header .ritual-title { color: #9b59b6; text-shadow: 0 0 8px #9b59b6; }
+
+.crystal-orb-container {
+  display: flex;
+  justify-content: center;
+  margin: 16px 0;
+}
+
+.crystal-orb {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, rgba(155, 89, 182, 0.4), rgba(0,0,0,0.9));
+  border: 2px solid #9b59b6;
+  box-shadow: 0 0 20px rgba(155, 89, 182, 0.4), inset 0 0 20px rgba(155, 89, 182, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.5s ease;
+  position: relative;
+}
+
+.crystal-orb.gazing {
+  animation: orb-pulse 0.8s ease-in-out infinite;
+  box-shadow: 0 0 40px rgba(155, 89, 182, 0.8), inset 0 0 30px rgba(155, 89, 182, 0.4);
+}
+
+.crystal-orb.severity-glow-low {
+  box-shadow: 0 0 25px rgba(155, 89, 182, 0.5), inset 0 0 20px rgba(155, 89, 182, 0.2);
+}
+.crystal-orb.severity-glow-medium {
+  box-shadow: 0 0 30px rgba(255, 165, 0, 0.5), inset 0 0 20px rgba(255, 165, 0, 0.15);
+  border-color: #ffa500;
+}
+.crystal-orb.severity-glow-high {
+  box-shadow: 0 0 35px rgba(255, 68, 68, 0.6), inset 0 0 25px rgba(255, 68, 68, 0.2);
+  border-color: #ff4444;
+  animation: orb-danger 1.5s ease-in-out infinite;
+}
+
+@keyframes orb-pulse {
+  0%,100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+@keyframes orb-danger {
+  0%,100% { box-shadow: 0 0 35px rgba(255,68,68,0.6), inset 0 0 25px rgba(255,68,68,0.2); }
+  50% { box-shadow: 0 0 50px rgba(255,68,68,0.9), inset 0 0 35px rgba(255,68,68,0.4); }
+}
+
+.orb-inner { font-size: 32px; color: #9b59b6; text-shadow: 0 0 15px #9b59b6; }
+.orb-loading { animation: spin 1s linear infinite; display: inline-block; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.orb-vision { animation: appear 0.5s ease; }
+@keyframes appear { from { opacity:0; transform:scale(0.5); } to { opacity:1; transform:scale(1); } }
+.orb-idle { opacity: 0.4; }
+
+.crystal-focus-input {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.crystal-label { font-size: 10px; color: #9b59b6; letter-spacing: 1px; }
+.crystal-input {
+  background: rgba(155, 89, 182, 0.05);
+  border: 1px solid #6c3483;
+  color: #d7bde2;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  padding: 7px 10px;
+  outline: none;
+}
+.crystal-input:focus { border-color: #9b59b6; box-shadow: 0 0 6px rgba(155,89,182,0.3); }
+.crystal-input::placeholder { color: #6c3483; }
+
+.crystal-vision {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.crystal-vision.visible { opacity: 1; transform: translateY(0); }
+
+.clarity-badge {
+  display: inline-block;
+  font-size: 9px;
+  letter-spacing: 2px;
+  padding: 2px 8px;
+  border: 1px solid;
+}
+.clarity-murky { border-color: #555; color: #555; }
+.clarity-hazy { border-color: #888; color: #888; }
+.clarity-clear { border-color: #9b59b6; color: #9b59b6; }
+.clarity-crystalline { border-color: #d7bde2; color: #d7bde2; text-shadow: 0 0 5px #d7bde2; }
+
+.vision-text {
+  color: #d7bde2;
+  font-size: 13px;
+  line-height: 1.7;
+  font-style: italic;
+  padding: 12px;
+  border-left: 2px solid #9b59b6;
+  background: rgba(155, 89, 182, 0.05);
+}
+.vision-quote { color: #9b59b6; font-size: 18px; font-family: Georgia, serif; }
+
+.crystal-btn { border-color: #9b59b6; color: #9b59b6; }
+.crystal-btn:hover:not(:disabled) {
+  background: rgba(155, 89, 182, 0.15);
+  box-shadow: 0 0 8px rgba(155, 89, 182, 0.4);
+}
+
+/* Inherit shared ritual styles from TarotCard.css via ritual-footer, ritual-btn, etc. */
+.ritual-footer {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(155, 89, 182, 0.3);
+  flex-wrap: wrap;
+}
+.ritual-btn {
+  background: transparent;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  padding: 7px 14px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: all 0.2s;
+  border: 1px solid;
+}
+.ritual-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.ritual-btn-share { border-color: #00ff41; color: #00ff41; }
+.ritual-btn-share:hover:not(:disabled) {
+  background: rgba(0,255,65,0.1);
+  box-shadow: 0 0 8px rgba(0,255,65,0.3);
+}
+.ritual-error {
+  color: #ff4444;
+  border: 1px solid #ff4444;
+  padding: 8px 12px;
+  font-size: 12px;
+  background: rgba(255,68,68,0.05);
+  margin-bottom: 8px;
+}
+.severity-badge {
+  display: inline-block;
+  font-size: 10px;
+  letter-spacing: 2px;
+  padding: 3px 10px;
+  border: 1px solid;
+}
+.severity-low { border-color: #888; color: #888; }
+.severity-medium { border-color: #ffa500; color: #ffa500; }
+.severity-high { border-color: #ff4444; color: #ff4444; }

@@ -114,12 +114,13 @@ router.post('/', async (req, res) => {
   }
 });
 
-// GET /api/conversations/:id/messages — paginated history
+// GET /api/conversations/:id/messages — paginated history with search
 router.get('/:id/messages', async (req, res) => {
   try {
     const { id } = req.params;
     const limit = Math.min(parseInt(req.query.limit) || 50, 100);
     const before = req.query.before; // cursor: message id
+    const q = req.query.q?.toString().trim();
 
     // Verify membership
     const member = await prisma.conversationMember.findUnique({
@@ -129,13 +130,31 @@ router.get('/:id/messages', async (req, res) => {
 
     const where = { conversationId: id };
     if (before) where.id = { lt: before };
+    if (q) where.content = { contains: q, mode: 'insensitive' };
 
     const messages = await prisma.message.findMany({
       where,
       orderBy: { createdAt: 'desc' },
       take: limit,
-      include: { sender: { select: { id: true, username: true } } }
+      include: {
+        sender: { select: { id: true, username: true } },
+        asciiGif: true,
+        reactions: {
+          select: { emoji: true, userId: true }
+        }
+      }
     });
+
+    // Aggregate reactions per message
+    const formatReactions = (reactions) => {
+      const map = {};
+      for (const r of reactions) {
+        if (!map[r.emoji]) map[r.emoji] = { emoji: r.emoji, count: 0, users: [] };
+        map[r.emoji].count++;
+        map[r.emoji].users.push(r.userId);
+      }
+      return Object.values(map);
+    };
 
     res.json({
       messages: messages.reverse().map(m => ({
@@ -144,6 +163,13 @@ router.get('/:id/messages', async (req, res) => {
         senderId: m.senderId,
         content: m.content,
         type: m.type,
+        asciiGif: m.asciiGif ? {
+          id: m.asciiGif.id,
+          frames: JSON.parse(m.asciiGif.frames),
+          frameDelay: m.asciiGif.frameDelay,
+          title: m.asciiGif.title,
+        } : null,
+        reactions: formatReactions(m.reactions),
         createdAt: m.createdAt
       })),
       hasMore: messages.length === limit

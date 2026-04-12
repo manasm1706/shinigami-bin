@@ -20,6 +20,13 @@ export interface ConversationMessage {
   senderId: string;
   content: string;
   type: string;
+  asciiGif?: {
+    id: string;
+    frames: string[];
+    frameDelay: number;
+    title: string;
+  } | null;
+  reactions?: { emoji: string; count: number; users?: string[] }[];
   createdAt: string;
 }
 
@@ -38,10 +45,12 @@ export function createConversation(data: {
 export function getConversationMessages(
   id: string,
   limit = 50,
-  before?: string
+  before?: string,
+  q?: string
 ): Promise<{ messages: ConversationMessage[]; hasMore: boolean }> {
   const params = new URLSearchParams({ limit: String(limit) });
   if (before) params.set('before', before);
+  if (q) params.set('q', q);
   return apiFetch(`/conversations/${id}/messages?${params}`);
 }
 

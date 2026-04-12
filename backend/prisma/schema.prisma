@@ -13,9 +13,11 @@ model User {
   passwordHash String
   createdAt    DateTime @default(now())
 
+  asciiGifs   AsciiGif[]
   messages    Message[]
   memberships ConversationMember[]
   prophecies  Prophecy[]
+  reactions   MessageReaction[]
 }
 
 model Conversation {
@@ -47,10 +49,40 @@ model Message {
   senderId       String
   content        String
   type           String   @default("text") // "text" | "ascii_gif"
+  asciiGifId     String?
   createdAt      DateTime @default(now())
 
-  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  sender       User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  conversation Conversation    @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User            @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  asciiGif     AsciiGif?       @relation(fields: [asciiGifId], references: [id], onDelete: SetNull)
+  reactions    MessageReaction[]
+}
+
+model MessageReaction {
+  id        String   @id @default(cuid())
+  messageId String
+  userId    String
+  emoji     String
+  createdAt DateTime @default(now())
+
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId, emoji])
+}
+
+model AsciiGif {
+  id         String   @id @default(cuid())
+  creatorId  String
+  title      String
+  frames     String   // JSON array of frame strings
+  frameDelay Int      @default(150) // ms per frame
+  width      Int      @default(80)
+  height     Int      @default(24)
+  createdAt  DateTime @default(now())
+
+  creator  User      @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  messages Message[]
 }
 
 model Prophecy {

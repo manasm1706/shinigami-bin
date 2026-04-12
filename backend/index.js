@@ -175,7 +175,7 @@ io.on('connection', (socket) => {
   });
 
   // Handle sending messages
-  socket.on('send_message', async ({ realm, sender, text, clientId }) => {
+  socket.on('send_message', async ({ realm, sender, text, clientId, type = 'text', asciiGifId }) => {
     // Rate limiting: Max 5 messages per 3 seconds
     const messageRateKey = `msg_${socket.id}`;
     if (!checkRateLimit(messageRateKey, 5, 3000)) {
@@ -214,8 +214,20 @@ io.on('connection', (socket) => {
       sender: validatedSender,
       text: validatedText,
       realm: validatedRealm,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      type: type === 'ascii_gif' ? 'ascii_gif' : 'text',
     };
+
+    // Attach ascii gif data if present
+    if (type === 'ascii_gif' && asciiGifId && socket.userId) {
+      try {
+        const prisma = require('./lib/prisma');
+        const gif = await prisma.asciiGif.findUnique({ where: { id: asciiGifId } });
+        if (gif) {
+          message.asciiGif = { id: gif.id, frames: JSON.parse(gif.frames), frameDelay: gif.frameDelay, title: gif.title };
+        }
+      } catch { /* non-fatal */ }
+    }
 
     // Always store in-memory as fallback
     messageStore.addMessage(message);
@@ -238,7 +250,8 @@ io.on('connection', (socket) => {
             conversationId: conv.id,
             senderId: socket.userId,
             content: validatedText,
-            type: 'text'
+            type: type === 'ascii_gif' ? 'ascii_gif' : 'text',
+            asciiGifId: type === 'ascii_gif' ? asciiGifId : undefined,
           }
         });
         // Update message id to DB id for consistency
@@ -256,6 +269,106 @@ io.on('connection', (socket) => {
     // Acknowledge delivery to the sender
     if (message.clientId) {
       socket.emit('message_ack', { clientId: message.clientId, id: message.id });
+    }
+  });
+
+  // Send message to a DM/group conversation room
+  socket.on('send_conversation_message', async ({ conversationId, text, clientId, type = 'text', asciiGifId }) => {
+    if (!socket.userId || !conversationId || !text) return;
+
+    const messageRateKey = `msg_${socket.id}`;
+    if (!checkRateLimit(messageRateKey, 5, 3000)) {
+      socket.emit('error', { message: 'Too many messages. Please wait.' });
+      return;
+    }
+
+    const messageValidation = validateMessage(text);
+    if (!messageValidation.valid) {
+      socket.emit('error', { message: messageValidation.error });
+      return;
+    }
+
+    try {
+      const prisma = require('./lib/prisma');
+      // Verify membership
+      const member = await prisma.conversationMember.findUnique({
+        where: { userId_conversationId: { userId: socket.userId, conversationId } }
+      });
+      if (!member) {
+        socket.emit('error', { message: 'Not a member of this conversation' });
+        return;
+      }
+
+      const dbMsg = await prisma.message.create({
+        data: {
+          conversationId,
+          senderId: socket.userId,
+          content: messageValidation.sanitized,
+          type: type === 'ascii_gif' ? 'ascii_gif' : 'text',
+          asciiGifId: type === 'ascii_gif' ? asciiGifId : undefined,
+        },
+        include: { sender: { select: { id: true, username: true } } }
+      });
+
+      const message = {
+        id: dbMsg.id,
+        clientId: clientId || null,
+        sender: dbMsg.sender.username,
+        senderId: dbMsg.senderId,
+        text: dbMsg.content,
+        conversationId,
+        timestamp: dbMsg.createdAt.toISOString(),
+        type: dbMsg.type,
+      };
+
+      // Attach ascii gif data
+      if (dbMsg.type === 'ascii_gif' && asciiGifId) {
+        try {
+          const gif = await prisma.asciiGif.findUnique({ where: { id: asciiGifId } });
+          if (gif) message.asciiGif = { id: gif.id, frames: JSON.parse(gif.frames), frameDelay: gif.frameDelay, title: gif.title };
+        } catch { /* non-fatal */ }
+      }
+
+      io.to(`conversation_${conversationId}`).emit('receive_message', message);
+      if (clientId) socket.emit('message_ack', { clientId, id: dbMsg.id });
+    } catch (err) {
+      console.error('send_conversation_message error:', err);
+      socket.emit('error', { message: 'Failed to send message' });
+    }
+  });
+
+  // Reaction toggle via socket (real-time broadcast)
+  socket.on('toggle_reaction', async ({ messageId, emoji }) => {
+    if (!socket.userId || !messageId || !emoji) return;
+    const ALLOWED = ['👍','👎','❤️','😂','😮','😢','🔥','💀','👻','⚡'];
+    if (!ALLOWED.includes(emoji)) return;
+    try {
+      const prisma = require('./lib/prisma');
+      const message = await prisma.message.findUnique({ where: { id: messageId } });
+      if (!message) return;
+      const member = await prisma.conversationMember.findUnique({
+        where: { userId_conversationId: { userId: socket.userId, conversationId: message.conversationId } }
+      });
+      if (!member) return;
+
+      const existing = await prisma.messageReaction.findUnique({
+        where: { messageId_userId_emoji: { messageId, userId: socket.userId, emoji } }
+      });
+      if (existing) {
+        await prisma.messageReaction.delete({ where: { id: existing.id } });
+      } else {
+        await prisma.messageReaction.create({ data: { messageId, userId: socket.userId, emoji } });
+      }
+
+      const reactions = await prisma.messageReaction.groupBy({
+        by: ['emoji'], where: { messageId }, _count: { emoji: true }
+      });
+      io.to(`conversation_${message.conversationId}`).emit('reaction_updated', {
+        messageId,
+        reactions: reactions.map(r => ({ emoji: r.emoji, count: r._count.emoji }))
+      });
+    } catch (err) {
+      console.error('toggle_reaction error:', err);
     }
   });
 
@@ -281,6 +394,13 @@ io.on('connection', (socket) => {
     if (!conversationId) return;
     socket.join(`conversation_${conversationId}`);
     console.log(`💬 Socket ${socket.id} joined conversation: ${conversationId}`);
+    // Broadcast updated online users to the conversation room
+    const room = io.sockets.adapter.rooms.get(`conversation_${conversationId}`);
+    const onlineCount = room ? room.size : 1;
+    io.to(`conversation_${conversationId}`).emit('online_users', {
+      conversationId,
+      count: onlineCount
+    });
   });
 
   // Handle disconnection
@@ -315,6 +435,9 @@ app.use('/api/fortune', fortuneRouter);
 app.use('/api/omens', require('./routes/omens'));
 app.use('/api/prophecies', require('./routes/prophecies'));
 app.use('/api/conversations', require('./routes/conversations'));
+app.use('/api/ascii-gifs', require('./routes/asciiGifs'));
+app.use('/api/messages/:messageId/reactions', require('./routes/reactions'));
+app.use('/api/rituals', require('./routes/rituals'));
 
 // Health check
 app.get('/api/health', async (req, res) => {

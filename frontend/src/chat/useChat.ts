@@ -10,8 +10,17 @@ export interface ChatMessage {
   sender: string;
   text: string;
   realm: string;
+  conversationId?: string;
   timestamp: string;
   status?: MessageStatus;
+  type?: 'text' | 'ascii_gif';
+  asciiGif?: {
+    id: string;
+    frames: string[];
+    frameDelay: number;
+    title: string;
+  };
+  reactions?: { emoji: string; count: number; users?: string[] }[];
 }
 
 export interface ChatUser {
@@ -23,9 +32,12 @@ export interface UseChatReturn {
   users: string[];
   isConnected: boolean;
   typingUsers: string[];
+  unreadCounts: Record<string, number>;
   joinRealm: (realm: string, username: string) => void;
   joinConversation: (conversationId: string) => void;
-  sendMessage: (text: string) => void;
+  sendMessage: (text: string, conversationId?: string) => void;
+  sendAsciiGif: (gifId: string, gif: ChatMessage['asciiGif'], conversationId?: string) => void;
+  toggleReaction: (messageId: string, emoji: string) => void;
   sendTypingStart: (conversationId: string) => void;
   sendTypingStop: (conversationId: string) => void;
   clearMessages: () => void;
@@ -36,6 +48,7 @@ export const useChat = (initialRealm?: string, username?: string): UseChatReturn
   const [users, setUsers] = useState<string[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
+  const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
   const typingTimeouts = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
 
   // Pending realm join — stored so we can re-join on reconnect
@@ -43,6 +56,7 @@ export const useChat = (initialRealm?: string, username?: string): UseChatReturn
   const currentRealm = useRef<string | null>(null);
   const currentUsername = useRef<string | null>(null);
 
+  const currentConversationId = useRef<string | null>(null);
   // Send queue for throttling (300ms debounce)
   const sendQueue = useRef<{ text: string; clientId: string }[]>([]);
   const sendTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -87,7 +101,6 @@ export const useChat = (initialRealm?: string, username?: string): UseChatReturn
 
     const handleReceiveMessage = (message: ChatMessage) => {
       setMessages(prev => {
-        // If we have a matching clientId (optimistic), replace it and mark delivered
         if (message.clientId) {
           const idx = prev.findIndex(m => m.clientId === message.clientId);
           if (idx !== -1) {
@@ -98,6 +111,13 @@ export const useChat = (initialRealm?: string, username?: string): UseChatReturn
         }
         return [...prev, { ...message, status: 'delivered' }];
       });
+      // Increment unread if message is for a conversation we're not currently viewing
+      if (message.conversationId && message.conversationId !== currentConversationId.current) {
+        setUnreadCounts(prev => ({
+          ...prev,
+          [message.conversationId!]: (prev[message.conversationId!] ?? 0) + 1
+        }));
+      }
     };
 
     const handleMessageAck = ({ clientId, id }: { clientId: string; id: string }) => {
@@ -142,6 +162,12 @@ export const useChat = (initialRealm?: string, username?: string): UseChatReturn
       if (existing) { clearTimeout(existing); typingTimeouts.current.delete(typingUser); }
     };
 
+    const handleReactionUpdated = ({ messageId, reactions }: { messageId: string; reactions: { emoji: string; count: number }[] }) => {
+      setMessages(prev => prev.map(m =>
+        m.id === messageId ? { ...m, reactions } : m
+      ));
+    };
+
     socketInstance.on('connect', handleConnect);
     socketInstance.on('disconnect', handleDisconnect);
     socketInstance.on('receive_message', handleReceiveMessage);
@@ -152,6 +178,7 @@ export const useChat = (initialRealm?: string, username?: string): UseChatReturn
     socketInstance.on('realm_history', handleRealmHistory);
     socketInstance.on('typing', handleTyping);
     socketInstance.on('typing_stopped', handleTypingStopped);
+    socketInstance.on('reaction_updated', handleReactionUpdated);
 
     // If already connected when this effect runs, join immediately
     if (socketInstance.connected && initialRealm && username) {
@@ -171,6 +198,7 @@ export const useChat = (initialRealm?: string, username?: string): UseChatReturn
       socketInstance.off('realm_history', handleRealmHistory);
       socketInstance.off('typing', handleTyping);
       socketInstance.off('typing_stopped', handleTypingStopped);
+      socketInstance.off('reaction_updated', handleReactionUpdated);
       typingTimeouts.current.forEach(t => clearTimeout(t));
     };
   }, []); // run once — socket is a singleton
@@ -193,17 +221,42 @@ export const useChat = (initialRealm?: string, username?: string): UseChatReturn
 
   const joinConversation = useCallback((conversationId: string) => {
     const sock = socketRef.current;
+    currentConversationId.current = conversationId;
+    currentRealm.current = null; // clear realm context when in conversation mode
     if (sock && sock.connected) {
       sock.emit('join_conversation', { conversationId });
     }
   }, []);
 
-  const sendMessage = useCallback((text: string) => {
+  const sendMessage = useCallback((text: string, conversationId?: string) => {
     const trimmed = text.trim();
-    if (!trimmed || !currentRealm.current || !currentUsername.current) return;
+    if (!trimmed) return;
+
+    const clientId = `client_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    const convId = conversationId ?? currentConversationId.current;
+
+    // If we have a conversation context, use conversation socket event
+    if (convId && !currentRealm.current) {
+      const optimistic: ChatMessage = {
+        id: clientId,
+        clientId,
+        sender: currentUsername.current ?? 'You',
+        text: trimmed,
+        realm: convId,
+        timestamp: new Date().toISOString(),
+        status: 'sending'
+      };
+      setMessages(prev => [...prev, optimistic]);
+      const sock = socketRef.current;
+      if (sock && sock.connected) {
+        sock.emit('send_conversation_message', { conversationId: convId, text: trimmed, clientId });
+      }
+      return;
+    }
+
+    if (!currentRealm.current || !currentUsername.current) return;
 
     // Optimistic update
-    const clientId = `client_${Date.now()}_${Math.random().toString(36).slice(2)}`;
     const optimistic: ChatMessage = {
       id: clientId,
       clientId,
@@ -222,6 +275,53 @@ export const useChat = (initialRealm?: string, username?: string): UseChatReturn
       flushSendQueue();
     }, 300);
   }, [flushSendQueue]);
+
+  const sendAsciiGif = useCallback((gifId: string, gif: ChatMessage['asciiGif'], conversationId?: string) => {
+    const sock = socketRef.current;
+    if (!sock || !sock.connected) return;
+    const clientId = `client_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    const convId = conversationId ?? currentConversationId.current;
+
+    // Optimistic
+    const optimistic: ChatMessage = {
+      id: clientId,
+      clientId,
+      sender: currentUsername.current ?? 'You',
+      text: gif?.title ?? 'ASCII GIF',
+      realm: convId ?? currentRealm.current ?? '',
+      timestamp: new Date().toISOString(),
+      status: 'sending',
+      type: 'ascii_gif',
+      asciiGif: gif,
+    };
+    setMessages(prev => [...prev, optimistic]);
+
+    if (convId && !currentRealm.current) {
+      sock.emit('send_conversation_message', {
+        conversationId: convId,
+        text: gif?.title ?? 'ASCII GIF',
+        clientId,
+        type: 'ascii_gif',
+        asciiGifId: gifId,
+      });
+    } else if (currentRealm.current) {
+      sock.emit('send_message', {
+        realm: currentRealm.current,
+        sender: currentUsername.current,
+        text: gif?.title ?? 'ASCII GIF',
+        clientId,
+        type: 'ascii_gif',
+        asciiGifId: gifId,
+      });
+    }
+  }, []);
+
+  const toggleReaction = useCallback((messageId: string, emoji: string) => {
+    const sock = socketRef.current;
+    if (sock && sock.connected) {
+      sock.emit('toggle_reaction', { messageId, emoji });
+    }
+  }, []);
 
   const sendTypingStart = useCallback((conversationId: string) => {
     const sock = socketRef.current;
@@ -246,9 +346,12 @@ export const useChat = (initialRealm?: string, username?: string): UseChatReturn
     users,
     isConnected,
     typingUsers,
+    unreadCounts,
     joinRealm,
     joinConversation,
     sendMessage,
+    sendAsciiGif,
+    toggleReaction,
     sendTypingStart,
     sendTypingStop,
     clearMessages

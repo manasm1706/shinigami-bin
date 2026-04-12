@@ -1,0 +1,167 @@
+.tarot-card-ritual {
+  background: linear-gradient(135deg, #0a0a0a 0%, #0a0a1a 100%);
+  border: 3px solid #4a90d9;
+  padding: 20px;
+  font-family: 'Courier New', monospace;
+  box-shadow: 0 0 20px rgba(74, 144, 217, 0.3), inset 0 0 30px rgba(74, 144, 217, 0.05);
+}
+
+.tarot-header { border-color: #4a90d9; }
+.tarot-header .ritual-icon { color: #4a90d9; text-shadow: 0 0 10px #4a90d9; }
+.tarot-header .ritual-title { color: #4a90d9; text-shadow: 0 0 8px #4a90d9; }
+
+.tarot-spread {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.tarot-spread.visible { opacity: 1; transform: translateY(0); }
+
+.tarot-cards {
+  display: flex;
+  gap: 12px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.tarot-card-item {
+  flex: 1;
+  min-width: 100px;
+  border: 1px solid #4a90d9;
+  padding: 12px 10px;
+  background: rgba(74, 144, 217, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: box-shadow 0.2s;
+}
+.tarot-card-item:hover { box-shadow: 0 0 12px rgba(74, 144, 217, 0.4); }
+.tarot-card-item.reversed { border-color: #d94a4a; background: rgba(217, 74, 74, 0.05); }
+
+.card-position {
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: #4a90d9;
+  text-transform: uppercase;
+}
+.tarot-card-item.reversed .card-position { color: #d94a4a; }
+
+.card-face {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 0;
+  border-top: 1px solid rgba(74, 144, 217, 0.3);
+  border-bottom: 1px solid rgba(74, 144, 217, 0.3);
+}
+
+.card-number {
+  font-size: 22px;
+  color: #4a90d9;
+  text-shadow: 0 0 8px #4a90d9;
+}
+.tarot-card-item.reversed .card-number { color: #d94a4a; text-shadow: 0 0 8px #d94a4a; }
+
+.card-name {
+  font-size: 11px;
+  color: #aad4ff;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+.card-reversed-label {
+  font-size: 9px;
+  color: #d94a4a;
+  letter-spacing: 1px;
+}
+
+.card-meaning {
+  font-size: 10px;
+  color: #7ab0e0;
+  line-height: 1.4;
+  font-style: italic;
+}
+
+/* shared ritual styles */
+.ritual-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid;
+}
+.ritual-icon { font-size: 20px; }
+.ritual-title { font-size: 18px; margin: 0; letter-spacing: 3px; }
+
+.ritual-body { min-height: 120px; }
+
+.ritual-loading {
+  text-align: center;
+  padding: 20px;
+  color: #4a90d9;
+}
+.loading-runes {
+  font-size: 20px;
+  letter-spacing: 6px;
+  animation: pulse 1.5s infinite;
+  margin-bottom: 10px;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+.ritual-error {
+  color: #ff4444;
+  border: 1px solid #ff4444;
+  padding: 8px 12px;
+  font-size: 12px;
+  background: rgba(255,68,68,0.05);
+}
+
+.severity-badge {
+  display: inline-block;
+  font-size: 10px;
+  letter-spacing: 2px;
+  padding: 3px 10px;
+  border: 1px solid;
+  margin-bottom: 8px;
+}
+.severity-low { border-color: #888; color: #888; }
+.severity-medium { border-color: #ffa500; color: #ffa500; }
+.severity-high { border-color: #ff4444; color: #ff4444; animation: pulse 1.5s infinite; }
+
+.ritual-footer {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(74, 144, 217, 0.3);
+  flex-wrap: wrap;
+}
+
+.ritual-btn {
+  background: transparent;
+  border: 1px solid #4a90d9;
+  color: #4a90d9;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  padding: 7px 14px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: all 0.2s;
+}
+.ritual-btn:hover:not(:disabled) {
+  background: rgba(74, 144, 217, 0.15);
+  box-shadow: 0 0 8px rgba(74, 144, 217, 0.4);
+}
+.ritual-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.ritual-btn-share {
+  border-color: #00ff41;
+  color: #00ff41;
+}
+.ritual-btn-share:hover:not(:disabled) {
+  background: rgba(0, 255, 65, 0.1);
+  box-shadow: 0 0 8px rgba(0, 255, 65, 0.3);
+}

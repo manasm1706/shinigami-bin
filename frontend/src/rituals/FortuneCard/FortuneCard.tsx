@@ -5,9 +5,10 @@ import type { FortuneResponse } from '../../services/fortune';
 
 interface FortuneCardProps {
   username?: string;
+  onShare?: (text: string) => void;
 }
 
-const FortuneCard: React.FC<FortuneCardProps> = ({ username = 'You' }) => {
+const FortuneCard: React.FC<FortuneCardProps> = ({ username = 'You', onShare }) => {
   const [fortune, setFortune] = useState<FortuneResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -129,6 +130,15 @@ const FortuneCard: React.FC<FortuneCardProps> = ({ username = 'You' }) => {
           CONSULT THE SHINIGAMI AGAIN
           <span className="button-icon">☠</span>
         </button>
+        {fortune && onShare && (
+          <button
+            className="consult-button"
+            style={{ marginTop: '10px', borderColor: '#00ff41', color: '#00ff41' }}
+            onClick={() => onShare(`☠ FORTUNE for ${fortune.username}:\n"${fortune.fortune}"\nSeverity: ${fortune.severity.toUpperCase()}`)}
+          >
+            ↗ SHARE TO CHAT
+          </button>
+        )}
       </div>
     </div>
   );

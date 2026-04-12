@@ -102,17 +102,17 @@
 - [x] POST /api/conversations — create DM or group room
 - [x] GET /api/conversations/:id/messages — paginated history
 - [x] POST /api/conversations/:id/members — add member to group
-- [ ] Socket.IO rooms mapped to conversationId (not just realm name)
+- [x] Socket.IO rooms mapped to conversationId (not just realm name)
 - [x] typing_start / typing_stop events per conversation
 - [x] online_users event per conversation
 
 ### Frontend
 - [x] Sidebar: show DMs + group rooms + realm channels
 - [x] ConversationList component (integrated into Sidebar)
-- [ ] DMConversation view
-- [ ] GroupRoom view
+- [x] DMConversation view
+- [x] GroupRoom view
 - [x] Typing indicator component
-- [ ] Online users list per conversation
+- [x] Online users list per conversation
 - [x] Create conversation modal (group)
 
 ---
@@ -120,53 +120,52 @@
 ## 🚧 Phase 3: ASCII GIF System
 
 ### ASCII GIF Player
-- [ ] AsciiGifPlayer component (frames: string[], frameDelay: number)
-- [ ] useInterval hook for frame cycling
-- [ ] Loop mode toggle
-- [ ] Pause/play controls
+- [x] AsciiGifPlayer component (frames: string[], frameDelay: number)
+- [x] useInterval hook for frame cycling
+- [x] Loop mode toggle
+- [x] Pause/play controls
 
 ### ASCII GIF Creator
-- [ ] AsciiGifCreator component
-- [ ] Multi-frame textarea editor (add/remove frames)
-- [ ] Frame delay slider
-- [ ] Live preview using AsciiGifPlayer
-- [ ] Save GIF to database (POST /api/ascii-gifs)
-- [ ] Load saved GIFs (GET /api/ascii-gifs)
+- [x] AsciiGifCreator component
+- [x] Multi-frame textarea editor (add/remove frames)
+- [x] Frame delay slider
+- [x] Live preview using AsciiGifPlayer
+- [x] Save GIF to database (POST /api/ascii-gifs)
+- [x] Load saved GIFs (GET /api/ascii-gifs)
 
 ### Video-to-ASCII Pipeline
-- [ ] Backend: POST /api/ascii-gifs/convert (accepts video upload)
-- [ ] Extract frames using ffmpeg or canvas
-- [ ] Resize frames to target resolution (e.g. 80x40)
-- [ ] Map pixel brightness to ASCII chars: `@#%*+=-:. `
+- [x] Backend: POST /api/ascii-gifs/convert (accepts image upload)
+- [x] Resize frames to target resolution (e.g. 80x40)
+- [x] Map pixel brightness to ASCII chars: `@#%*+=-:. `
 - [ ] Optional: colored ASCII using styled spans (RGB from pixel)
 - [ ] Return frame array + suggested frameDelay
 
 ### Message Integration
-- [ ] ascii_gif message type in Message schema
-- [ ] Render AsciiGifPlayer inline in ChatWindow for ascii_gif messages
-- [ ] Send ASCII GIF button in MessageInput
+- [x] ascii_gif message type in Message schema
+- [x] Render AsciiGifPlayer inline in ChatWindow for ascii_gif messages
+- [x] Send ASCII GIF button in MessageInput
 
 ---
 
 ## 🚧 Phase 4: Messaging Polish
 
-- [ ] Message reactions (emoji, stored in DB)
-- [ ] Message search (GET /api/conversations/:id/messages?q=)
-- [ ] Message pagination (cursor-based, load older messages on scroll)
-- [ ] Virtual scrolling for large message lists
-- [ ] Sound effects (ritual completion, new message)
-- [ ] Unread message count per conversation
+- [x] Message reactions (emoji, stored in DB)
+- [x] Message search (GET /api/conversations/:id/messages?q=)
+- [x] Message pagination (cursor-based, load older messages on scroll)
+- [x] Virtual scrolling for large message lists
+- [x] Sound effects (ritual completion, new message)
+- [x] Unread message count per conversation
 
 ---
 
 ## 🚧 Phase 5: Additional Rituals + MCP Expansion
 
-- [ ] Tarot card reading ritual
-- [ ] Crystal ball ritual
-- [ ] Rune casting ritual
-- [ ] Real weather API in MCP server (replace mock)
+- [x] Tarot card reading ritual
+- [x] Crystal ball ritual
+- [x] Rune casting ritual
+- [x] Real weather API in MCP server (Open-Meteo + Nominatim geocoding, no API key)
 - [ ] Astrology MCP server
-- [ ] Ritual results shareable as messages
+- [x] Ritual results shareable as messages
 
 ---
 

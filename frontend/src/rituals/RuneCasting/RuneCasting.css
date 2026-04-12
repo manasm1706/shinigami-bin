@@ -1,0 +1,151 @@
+.rune-casting-ritual {
+  background: linear-gradient(135deg, #0a0a0a 0%, #0f0a00 100%);
+  border: 3px solid #c0a060;
+  padding: 20px;
+  font-family: 'Courier New', monospace;
+  box-shadow: 0 0 20px rgba(192, 160, 96, 0.3), inset 0 0 30px rgba(192, 160, 96, 0.05);
+}
+
+.rune-header { border-color: #c0a060; }
+.rune-header .ritual-icon { color: #c0a060; text-shadow: 0 0 10px #c0a060; font-size: 22px; }
+.rune-header .ritual-title { color: #c0a060; text-shadow: 0 0 8px #c0a060; }
+
+.rune-count-selector {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.rune-label { font-size: 10px; color: #c0a060; letter-spacing: 1px; }
+.rune-count-btns { display: flex; gap: 6px; }
+.rune-count-btn {
+  background: transparent;
+  border: 1px solid #6b5a30;
+  color: #c0a060;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.rune-count-btn:hover:not(:disabled) { border-color: #c0a060; }
+.rune-count-btn.active { border-color: #c0a060; background: rgba(192,160,96,0.15); box-shadow: 0 0 6px rgba(192,160,96,0.4); }
+.rune-count-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.rune-loading { text-align: center; padding: 16px; color: #c0a060; }
+.rune-scatter {
+  font-size: 22px;
+  letter-spacing: 8px;
+  animation: scatter 0.6s ease-in-out infinite alternate;
+  margin-bottom: 8px;
+}
+@keyframes scatter {
+  from { letter-spacing: 4px; opacity: 0.6; }
+  to { letter-spacing: 12px; opacity: 1; }
+}
+
+.rune-results {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.rune-results.visible { opacity: 1; transform: translateY(0); }
+
+.rune-stones {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.rune-stone {
+  flex: 1;
+  min-width: 80px;
+  border: 1px solid #6b5a30;
+  padding: 10px 8px;
+  background: rgba(192, 160, 96, 0.04);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  transition: box-shadow 0.2s;
+}
+.rune-stone:hover { box-shadow: 0 0 10px rgba(192,160,96,0.3); }
+.rune-stone.reversed { border-color: #8b4513; background: rgba(139,69,19,0.06); }
+
+.rune-symbol {
+  font-size: 28px;
+  color: #c0a060;
+  text-shadow: 0 0 10px #c0a060;
+  line-height: 1;
+}
+.rune-stone.reversed .rune-symbol { color: #cd853f; text-shadow: 0 0 10px #cd853f; }
+
+.rune-name {
+  font-size: 10px;
+  color: #c0a060;
+  letter-spacing: 1px;
+  text-align: center;
+}
+.rune-stone.reversed .rune-name { color: #cd853f; }
+
+.rune-meaning {
+  font-size: 9px;
+  color: #a08040;
+  line-height: 1.4;
+  text-align: center;
+  font-style: italic;
+}
+
+.ritual-footer {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(192, 160, 96, 0.3);
+  flex-wrap: wrap;
+}
+.ritual-btn {
+  background: transparent;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  padding: 7px 14px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: all 0.2s;
+  border: 1px solid;
+}
+.ritual-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.rune-btn { border-color: #c0a060; color: #c0a060; }
+.rune-btn:hover:not(:disabled) {
+  background: rgba(192,160,96,0.12);
+  box-shadow: 0 0 8px rgba(192,160,96,0.4);
+}
+.ritual-btn-share { border-color: #00ff41; color: #00ff41; }
+.ritual-btn-share:hover:not(:disabled) {
+  background: rgba(0,255,65,0.1);
+  box-shadow: 0 0 8px rgba(0,255,65,0.3);
+}
+.ritual-error {
+  color: #ff4444;
+  border: 1px solid #ff4444;
+  padding: 8px 12px;
+  font-size: 12px;
+  background: rgba(255,68,68,0.05);
+  margin-bottom: 8px;
+}
+.severity-badge {
+  display: inline-block;
+  font-size: 10px;
+  letter-spacing: 2px;
+  padding: 3px 10px;
+  border: 1px solid;
+}
+.severity-low { border-color: #888; color: #888; }
+.severity-medium { border-color: #ffa500; color: #ffa500; }
+.severity-high { border-color: #ff4444; color: #ff4444; }
+.ritual-loading { text-align: center; padding: 20px; }
