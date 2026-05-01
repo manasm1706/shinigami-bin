@@ -209,3 +209,16 @@
 - [x] `AsciiGifCreator` — 3-tab UI (Draw / IMG→ASCII / VIDEO→ASCII), progress bar, 10s duration badge
 - [x] `convertVideoToAscii()` service using `FormData` + `XMLHttpRequest` for upload progress
 - [x] Backend enforces 10s max: `frameCount * frameDelay ≤ 10000ms`
+
+## ✅ Phase 7: Polish + Production
+
+- [x] Error boundary component (wraps entire app + ChatPage)
+- [x] Loading skeleton components (MessageSkeleton, ConversationSkeleton)
+- [x] Toast notification system with useToast hook
+- [x] Socket error events dispatched to Toast via CustomEvent
+- [x] PWA manifest.json + favicon.svg
+- [x] index.html — proper title, meta viewport, theme-color, apple-mobile-web-app tags
+- [x] Mobile responsive: sidebar drawer on mobile (< 640px), ritual panel full-screen
+- [x] AsciiGif.frames migrated from JSON string → native PostgreSQL String[] array
+- [x] Rate limiting errors surfaced via Toast (socket error → CustomEvent → useToast)
+- [x] ARIA roles on Sidebar nav (role=navigation, aria-label, aria-current)

@@ -121,15 +121,22 @@ ASCII GIF system, messaging polish, and 6 rituals (Fortune, Wheel, Weather, Taro
 
 ---
 
-## Phase 7: Polish + Production (v0.9.0)
+## Phase 7: Polish + Production (v0.9.0) ✅
 
-- PWA manifest + service worker
-- Mobile responsive layout
-- Dark/light theme toggle (keep terminal aesthetic)
-- Rate limiting UI feedback
-- Error boundary components
-- Loading skeletons
-- Accessibility audit (ARIA labels, focus management)
+### What changed:
+- `frontend/src/components/ErrorBoundary/` — was: did not exist. Now: class-based ErrorBoundary with terminal-style error UI and reset/reload buttons.
+- `frontend/src/components/Skeleton/` — was: did not exist. Now: `Skeleton`, `MessageSkeleton`, `ConversationSkeleton` components with shimmer animation.
+- `frontend/src/components/Toast/` — was: did not exist. Now: `Toast` component + `useToast` hook for rate-limit and error notifications.
+- `frontend/src/main.tsx` — was: no error boundary. Now: wrapped in `<ErrorBoundary>`.
+- `frontend/src/app/Layout/Layout.tsx` — was: `<Outlet />` unprotected. Now: wrapped in `<ErrorBoundary>`.
+- `frontend/src/chat/ChatPage.tsx` — was: no toast, no mobile sidebar. Now: `useToast` wired to socket errors, mobile sidebar toggle button + backdrop overlay.
+- `frontend/src/chat/ChatPage.css` — was: no mobile layout. Now: sidebar becomes fixed drawer on < 640px, ritual panel goes full-screen on mobile.
+- `frontend/src/chat/useChat.ts` — was: socket errors logged to console only. Now: dispatches `shinigami:socket-error` CustomEvent for Toast pickup.
+- `frontend/index.html` — was: generic title, no PWA meta. Now: proper title, viewport, theme-color, apple-mobile-web-app, OG tags.
+- `frontend/public/manifest.json` — was: did not exist. Now: PWA manifest with name, icons, theme_color, display=standalone.
+- `frontend/public/favicon.svg` — was: vite.svg. Now: custom 死 kanji SVG favicon in terminal green.
+- `backend/prisma/schema.prisma` (AsciiGif.frames) — was: `String` (JSON-serialized array). Now: `String[]` (native PostgreSQL array) — no more manual JSON.parse/stringify.
+- `backend/routes/asciiGifs.js` — was: `JSON.stringify(frames)` on write, `JSON.parse(g.frames)` on read. Now: direct array pass-through.
 
 ---
 

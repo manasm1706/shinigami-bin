@@ -72,7 +72,7 @@ router.get('/', async (req, res) => {
       take: 50,
       include: { creator: { select: { id: true, username: true } } }
     });
-    res.json({ gifs: gifs.map(g => ({ ...g, frames: JSON.parse(g.frames) })) });
+    res.json({ gifs: gifs.map(g => ({ ...g, frames: g.frames })) });
   } catch (err) {
     console.error('List ascii gifs error:', err);
     res.status(500).json({ error: 'Failed to retrieve ASCII GIFs' });
@@ -103,7 +103,7 @@ router.post('/', async (req, res) => {
       data: {
         creatorId: req.user.id,
         title: title.trim(),
-        frames: JSON.stringify(frames),
+        frames: frames,
         frameDelay: delay,
         width: Math.max(10, Math.min(200, Number(width))),
         height: Math.max(5, Math.min(100, Number(height))),
@@ -126,7 +126,7 @@ router.get('/:id', async (req, res) => {
       include: { creator: { select: { id: true, username: true } } }
     });
     if (!gif) return res.status(404).json({ error: 'ASCII GIF not found' });
-    res.json({ gif: { ...gif, frames: JSON.parse(gif.frames) } });
+    res.json({ gif: { ...gif, frames: gif.frames } });
   } catch (err) {
     res.status(500).json({ error: 'Failed to retrieve ASCII GIF' });
   }

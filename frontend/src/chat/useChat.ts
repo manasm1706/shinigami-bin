@@ -168,6 +168,10 @@ export const useChat = (initialRealm?: string, username?: string): UseChatReturn
       ));
     };
 
+    const handleSocketError = ({ message }: { message: string }) => {
+      window.dispatchEvent(new CustomEvent('shinigami:socket-error', { detail: { message } }));
+    };
+
     socketInstance.on('connect', handleConnect);
     socketInstance.on('disconnect', handleDisconnect);
     socketInstance.on('receive_message', handleReceiveMessage);
@@ -179,6 +183,7 @@ export const useChat = (initialRealm?: string, username?: string): UseChatReturn
     socketInstance.on('typing', handleTyping);
     socketInstance.on('typing_stopped', handleTypingStopped);
     socketInstance.on('reaction_updated', handleReactionUpdated);
+    socketInstance.on('error', handleSocketError);
 
     // If already connected when this effect runs, join immediately
     if (socketInstance.connected && initialRealm && username) {
@@ -199,6 +204,7 @@ export const useChat = (initialRealm?: string, username?: string): UseChatReturn
       socketInstance.off('typing', handleTyping);
       socketInstance.off('typing_stopped', handleTypingStopped);
       socketInstance.off('reaction_updated', handleReactionUpdated);
+      socketInstance.off('error', handleSocketError);
       typingTimeouts.current.forEach(t => clearTimeout(t));
     };
   }, []); // run once — socket is a singleton

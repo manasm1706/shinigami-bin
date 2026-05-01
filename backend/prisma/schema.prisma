@@ -78,7 +78,7 @@ model AsciiGif {
   id         String   @id @default(cuid())
   creatorId  String
   title      String
-  frames     String   // JSON array of frame strings
+  frames     String[] // native array of frame strings
   frameDelay Int      @default(150) // ms per frame
   width      Int      @default(80)
   height     Int      @default(24)

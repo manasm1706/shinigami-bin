@@ -9,6 +9,7 @@ import {
   EKGOverlay,
   useEffectSettings 
 } from '../../effects';
+import ErrorBoundary from '../../components/ErrorBoundary/ErrorBoundary';
 import './Layout.css';
 
 const Layout: React.FC = () => {
@@ -54,7 +55,9 @@ const Layout: React.FC = () => {
       </header>
 
       <main className="layout-content">
-        <Outlet />
+        <ErrorBoundary>
+          <Outlet />
+        </ErrorBoundary>
       </main>
       
       {/* EKG/ECG full-screen effect — always on, behind content */}
