@@ -1,0 +1,89 @@
+.error-boundary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-height: 200px;
+  background: #000;
+  font-family: 'Courier New', monospace;
+}
+
+.eb-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 32px;
+  border: 2px solid #ff4444;
+  background: rgba(255, 68, 68, 0.05);
+  box-shadow: 0 0 30px rgba(255, 68, 68, 0.2);
+  max-width: 480px;
+  width: 90%;
+}
+
+.eb-skull {
+  font-size: 48px;
+  animation: eb-pulse 2s ease-in-out infinite;
+}
+
+@keyframes eb-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.95); }
+}
+
+.eb-title {
+  color: #ff4444;
+  font-size: 18px;
+  letter-spacing: 4px;
+  text-shadow: 0 0 10px #ff4444;
+}
+
+.eb-ascii {
+  color: #ff4444;
+  font-size: 12px;
+  line-height: 1.4;
+  opacity: 0.7;
+  text-align: center;
+}
+
+.eb-message {
+  color: #ff8888;
+  font-size: 12px;
+  text-align: center;
+  padding: 8px 12px;
+  border: 1px solid rgba(255, 68, 68, 0.3);
+  background: rgba(255, 68, 68, 0.05);
+  max-width: 100%;
+  word-break: break-word;
+}
+
+.eb-reset-btn,
+.eb-reload-btn {
+  background: transparent;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  padding: 8px 20px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: all 0.2s;
+  width: 100%;
+}
+
+.eb-reset-btn {
+  border: 2px solid #ff4444;
+  color: #ff4444;
+}
+.eb-reset-btn:hover {
+  background: rgba(255, 68, 68, 0.15);
+  box-shadow: 0 0 10px rgba(255, 68, 68, 0.4);
+}
+
+.eb-reload-btn {
+  border: 1px solid #555;
+  color: #555;
+}
+.eb-reload-btn:hover {
+  border-color: #888;
+  color: #888;
+}

@@ -4,6 +4,7 @@ export { default as EffectGhostOverlay } from './GhostOverlay/EffectGhostOverlay
 export { default as CRTOverlay } from './CRTOverlay/CRTOverlay';
 export { default as GlitchText } from './GlitchText/GlitchText';
 export { default as EffectDemo } from './EffectDemo/EffectDemo';
+export { default as EKGOverlay } from './EKGOverlay/EKGOverlay';
 
 // Effect settings
 export { EffectSettingsProvider, useEffectSettings } from './EffectSettings/EffectSettings';

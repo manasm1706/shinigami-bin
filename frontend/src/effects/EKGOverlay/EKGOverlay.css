@@ -1,0 +1,9 @@
+.ekg-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 2;
+  /* Sits above the layout bg but below all interactive content */
+}

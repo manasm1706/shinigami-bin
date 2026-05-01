@@ -389,7 +389,7 @@ io.on('connection', (socket) => {
     });
   });
 
-  // Join a conversation room (DM / group)
+  // Join a conversation room (DM / group / community channel)
   socket.on('join_conversation', ({ conversationId }) => {
     if (!conversationId) return;
     socket.join(`conversation_${conversationId}`);
@@ -426,7 +426,8 @@ io.on('connection', (socket) => {
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Routes
 app.use('/api/auth', require('./routes/auth'));
@@ -438,6 +439,7 @@ app.use('/api/conversations', require('./routes/conversations'));
 app.use('/api/ascii-gifs', require('./routes/asciiGifs'));
 app.use('/api/messages/:messageId/reactions', require('./routes/reactions'));
 app.use('/api/rituals', require('./routes/rituals'));
+app.use('/api/communities', require('./routes/communities'));
 
 // Health check
 app.get('/api/health', async (req, res) => {

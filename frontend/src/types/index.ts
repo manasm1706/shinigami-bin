@@ -45,3 +45,25 @@ export interface Conversation {
   members: ConversationMember[];
   lastMessage: { content: string; createdAt: string } | null;
 }
+
+export interface Community {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  isPublic: boolean;
+  owner: { id: string; username: string };
+  memberCount: number;
+  channelCount: number;
+  isMember: boolean;
+  role: 'owner' | 'member' | null;
+}
+
+export interface CommunityChannel {
+  id: string;
+  communityId: string;
+  name: string;
+  description: string;
+  conversationId: string | null;
+  createdAt: string;
+}

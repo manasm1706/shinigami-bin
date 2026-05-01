@@ -13,11 +13,13 @@ model User {
   passwordHash String
   createdAt    DateTime @default(now())
 
-  asciiGifs   AsciiGif[]
-  messages    Message[]
-  memberships ConversationMember[]
-  prophecies  Prophecy[]
-  reactions   MessageReaction[]
+  asciiGifs        AsciiGif[]
+  messages         Message[]
+  memberships      ConversationMember[]
+  prophecies       Prophecy[]
+  reactions        MessageReaction[]
+  ownedCommunities Community[]
+  communityMembers CommunityMember[]
 }
 
 model Conversation {
@@ -29,6 +31,7 @@ model Conversation {
 
   members  ConversationMember[]
   messages Message[]
+  communityChannel CommunityChannel?
 }
 
 model ConversationMember {
@@ -96,4 +99,43 @@ model Prophecy {
   createdAt        DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Community {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String   @default("")
+  icon        String   @default("◆")
+  ownerId     String
+  isPublic    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  owner    User              @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  members  CommunityMember[]
+  channels CommunityChannel[]
+}
+
+model CommunityMember {
+  id          String   @id @default(cuid())
+  communityId String
+  userId      String
+  role        String   @default("member") // "owner" | "member"
+  joinedAt    DateTime @default(now())
+
+  community Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([communityId, userId])
+}
+
+model CommunityChannel {
+  id          String   @id @default(cuid())
+  communityId String
+  name        String
+  description String   @default("")
+  createdAt   DateTime @default(now())
+
+  community     Community    @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  conversation  Conversation? @relation(fields: [conversationId], references: [id])
+  conversationId String?      @unique
 }

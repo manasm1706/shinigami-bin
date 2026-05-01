@@ -232,3 +232,35 @@
     padding: 12px;
   }
 }
+
+/* Keyboard hint bar */
+.keyboard-hint {
+  font-size: 10px;
+  color: #00aa33;
+  background: rgba(0, 255, 65, 0.04);
+  border: 1px solid rgba(0, 170, 51, 0.3);
+  padding: 5px 8px;
+  margin-bottom: 12px;
+  letter-spacing: 0.5px;
+  line-height: 1.6;
+}
+
+.hint-key {
+  display: inline-block;
+  background: rgba(0, 255, 65, 0.12);
+  border: 1px solid #00aa33;
+  color: #00ff41;
+  font-size: 9px;
+  padding: 1px 5px;
+  border-radius: 2px;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.5px;
+}
+
+/* Ensure toggle button is always clickable */
+.settings-toggle {
+  cursor: pointer;
+  pointer-events: auto;
+  position: relative;
+  z-index: 201;
+}

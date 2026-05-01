@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import Router from './app/Router'
+import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary'
 import { initializeRituals } from './rituals/initRituals'
 import { ritualEffectMapper } from './effects/RitualEffectMapper'
 
@@ -13,6 +14,8 @@ ritualEffectMapper.initialize();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <Router />
+    <ErrorBoundary>
+      <Router />
+    </ErrorBoundary>
   </StrictMode>,
 )

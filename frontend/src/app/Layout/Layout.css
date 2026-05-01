@@ -114,7 +114,7 @@
   bottom: 0;
   background: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.3) 100%);
   pointer-events: none;
-  z-index: 999;
+  z-index: 1;
 }
 
 .layout::after {
@@ -131,8 +131,19 @@
   );
   background-size: 100% 4px;
   pointer-events: none;
-  z-index: 999;
+  z-index: 1;
   animation: scanline 8s linear infinite;
+}
+
+/* Ensure header and interactive elements are always above overlays */
+.layout-header {
+  position: relative;
+  z-index: 200;
+}
+
+.layout-content {
+  position: relative;
+  z-index: 10;
 }
 
 @keyframes scanline {

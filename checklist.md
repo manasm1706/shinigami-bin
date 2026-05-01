@@ -170,3 +170,42 @@
 ---
 
 *Last updated: Production planning phase*
+
+---
+
+## ✅ Phase 6 Part 1: UX Fixes + EKG Effect
+
+- [x] Fix `layout::before/after` z-index blocking mouse clicks on header (was z-index 999, now z-index 1 with pointer-events: none)
+- [x] Rename EFFECTS button → CONTROLS
+- [x] Add keyboard hint in CONTROLS panel: Tab = next · Shift+Tab = prev · Enter = select
+- [x] EKGOverlay component — scrolling neon EKG waveform on canvas
+- [x] Grid background (faint green lines)
+- [x] Vital signs HUD (heart rate BPM + SpO2 %)
+- [x] Scanning horizontal line sweeping top-to-bottom
+- [x] Random screen glitch at intervals 1s–5min (random uniform)
+- [x] Glitch: chromatic aberration tears + color shift + waveform turns red
+- [x] EKGOverlay mounted globally in Layout behind all content (z-index: 2, pointer-events: none)
+
+## 🚧 Phase 6 Part 2: Realm Redesign (Communities)
+
+- [x] Add `Community` + `CommunityMember` + `CommunityChannel` Prisma models
+- [x] `GET/POST /api/communities` routes
+- [x] `POST /api/communities/:id/join` + `POST /api/communities/:id/leave` routes
+- [x] `GET/POST /api/communities/:id/channels` routes
+- [x] `CommunityBrowser` component (Beyond realm view — browse/join/create communities + channels)
+- [x] Living realm = DMs + Groups (unchanged)
+- [x] Unknown realm = global realm chat (unchanged)
+- [x] Beyond realm = CommunityBrowser (new)
+- [x] ChatPage routes Beyond realm to CommunityBrowser
+- [x] Community channel selection opens conversation view
+
+## ✅ Phase 7: ASCII GIF v2 — Video Support + Monochrome Green
+
+- [x] Fix `express.json()` 100kb limit → 50mb (was causing 413 misread as auth error)
+- [x] `POST /api/ascii-gifs/convert-video` — multer upload + fluent-ffmpeg frame extraction + sharp ASCII conversion
+- [x] Video crop controls (start/end time sliders, max 10 seconds enforced)
+- [x] Monochrome green palette — 10 shades `#001a00` → `#00ff41` mapped by brightness
+- [x] `AsciiGifPlayer` — always loops, per-character green shade rendering via colored spans
+- [x] `AsciiGifCreator` — 3-tab UI (Draw / IMG→ASCII / VIDEO→ASCII), progress bar, 10s duration badge
+- [x] `convertVideoToAscii()` service using `FormData` + `XMLHttpRequest` for upload progress
+- [x] Backend enforces 10s max: `frameCount * frameDelay ≤ 10000ms`

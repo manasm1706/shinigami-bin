@@ -1,5 +1,5 @@
 .ascii-gif-player {
-  background: #050505;
+  background: #020802;
   border: 1px solid #00aa33;
   padding: 8px;
   display: inline-block;
@@ -7,7 +7,7 @@
 }
 
 .ascii-gif-player.compact {
-  border-color: #005522;
+  border-color: #003311;
   padding: 4px;
 }
 
@@ -20,6 +20,7 @@
   text-transform: uppercase;
 }
 
+/* Plain frame (no shade data) */
 .agp-frame {
   font-family: 'Courier New', monospace;
   font-size: 10px;
@@ -30,9 +31,18 @@
   overflow: hidden;
 }
 
+/* Colored frame — spans handle individual char colors */
+.agp-frame-colored {
+  color: #00ff41; /* fallback */
+}
+
+.agp-line {
+  display: block;
+  line-height: 1.2;
+}
+
 .ascii-gif-player.compact .agp-frame {
   font-size: 8px;
-  color: #00cc33;
 }
 
 .agp-controls {

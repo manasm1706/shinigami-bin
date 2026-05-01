@@ -15,16 +15,17 @@ const EffectSettingsPanel: React.FC<EffectSettingsPanelProps> = ({ className = '
       <button 
         className="settings-toggle"
         onClick={() => setIsExpanded(!isExpanded)}
-        aria-label="Toggle effect settings"
+        aria-label="Toggle controls panel"
+        title="Tab = next element · Shift+Tab = previous · Enter/Space = activate"
       >
         <span className="toggle-icon">{isExpanded ? '⚙️' : '🎛️'}</span>
-        <span className="toggle-text">EFFECTS</span>
+        <span className="toggle-text">CONTROLS</span>
       </button>
 
       {isExpanded && (
         <div className="settings-content">
           <div className="settings-header">
-            <h3>Visual Effects</h3>
+            <h3>Controls &amp; Effects</h3>
             <button 
               className="reset-button"
               onClick={resetSettings}
@@ -32,6 +33,12 @@ const EffectSettingsPanel: React.FC<EffectSettingsPanelProps> = ({ className = '
             >
               ↻
             </button>
+          </div>
+
+          <div className="keyboard-hint">
+            <span className="hint-key">Tab</span> next &nbsp;
+            <span className="hint-key">Shift+Tab</span> prev &nbsp;
+            <span className="hint-key">Enter</span> select
           </div>
 
           {/* CRT Overlay Settings */}

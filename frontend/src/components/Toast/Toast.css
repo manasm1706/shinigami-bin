@@ -1,0 +1,90 @@
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 99999;
+  pointer-events: none;
+  max-width: 360px;
+  width: calc(100vw - 48px);
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  border: 1px solid;
+  pointer-events: auto;
+  opacity: 0;
+  transform: translateX(20px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.toast.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.toast-error {
+  background: rgba(255, 68, 68, 0.12);
+  border-color: #ff4444;
+  color: #ff4444;
+}
+
+.toast-warning {
+  background: rgba(255, 165, 0, 0.1);
+  border-color: #ffa500;
+  color: #ffa500;
+}
+
+.toast-info {
+  background: rgba(0, 255, 65, 0.06);
+  border-color: #00aa33;
+  color: #00aa33;
+}
+
+.toast-success {
+  background: rgba(0, 255, 65, 0.1);
+  border-color: #00ff41;
+  color: #00ff41;
+}
+
+.toast-icon {
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.toast-message {
+  flex: 1;
+  line-height: 1.4;
+}
+
+.toast-close {
+  background: transparent;
+  border: none;
+  color: inherit;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  cursor: pointer;
+  opacity: 0.6;
+  padding: 0;
+  flex-shrink: 0;
+  transition: opacity 0.15s;
+}
+.toast-close:hover { opacity: 1; }
+
+@media (max-width: 480px) {
+  .toast-container {
+    bottom: 16px;
+    right: 12px;
+    left: 12px;
+    width: auto;
+    max-width: none;
+  }
+}

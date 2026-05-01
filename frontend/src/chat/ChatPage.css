@@ -82,3 +82,91 @@
     max-height: 50vh;
   }
 }
+
+/* ── Mobile responsive ─────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .chat-page {
+    flex-direction: column;
+    position: relative;
+  }
+
+  /* Sidebar becomes a slide-in drawer on mobile */
+  .chat-page > aside {
+    position: fixed;
+    left: -100%;
+    top: 0;
+    bottom: 0;
+    z-index: 500;
+    width: 80vw;
+    max-width: 280px;
+    transition: left 0.25s ease;
+    box-shadow: 4px 0 20px rgba(0, 255, 65, 0.2);
+  }
+
+  .chat-page.sidebar-open > aside {
+    left: 0;
+  }
+
+  .chat-main {
+    width: 100%;
+  }
+
+  .ritual-panel {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    min-width: unset;
+    border-left: none;
+    border-top: 2px solid #00ff41;
+    z-index: 400;
+    max-height: 85vh;
+    top: auto;
+  }
+}
+
+/* Mobile sidebar toggle button */
+.mobile-sidebar-toggle {
+  display: none;
+  position: fixed;
+  top: 70px;
+  left: 8px;
+  z-index: 600;
+  background: rgba(0, 0, 0, 0.9);
+  border: 1px solid #00aa33;
+  color: #00aa33;
+  font-family: 'Courier New', monospace;
+  font-size: 16px;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: all 0.2s;
+}
+
+.mobile-sidebar-toggle:hover {
+  border-color: #00ff41;
+  color: #00ff41;
+}
+
+@media (max-width: 640px) {
+  .mobile-sidebar-toggle {
+    display: flex;
+  }
+}
+
+/* Mobile overlay backdrop */
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 499;
+}
+
+@media (max-width: 640px) {
+  .sidebar-backdrop.visible {
+    display: block;
+  }
+}

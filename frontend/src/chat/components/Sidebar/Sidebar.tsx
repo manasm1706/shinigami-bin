@@ -52,10 +52,10 @@ const Sidebar: React.FC<SidebarProps> = ({
   };
 
   return (
-    <aside className="sidebar">
-      <nav className="sidebar-nav">
+    <aside className="sidebar" role="navigation" aria-label="Chat navigation">
+      <nav className="sidebar-nav" aria-label="Channels and conversations">
         {/* Realms */}
-        <div className="nav-section-header">
+        <div className="nav-section-header" role="heading" aria-level={2}>
           <span className="crt-flicker">▼ REALMS</span>
         </div>
         {realms.map((realm) => (
@@ -63,6 +63,8 @@ const Sidebar: React.FC<SidebarProps> = ({
             key={realm.id}
             className={`nav-item ${activeRealmId === realm.id && !activeConversationId ? 'active' : ''}`}
             onClick={() => onRealmSelect(realm.id)}
+            aria-current={activeRealmId === realm.id && !activeConversationId ? 'page' : undefined}
+            aria-label={`${realm.name} realm${realm.description ? ` — ${realm.description}` : ''}`}
           >
             <span className="nav-icon">◆</span>
             <span className="nav-name">{realm.name}</span>

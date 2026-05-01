@@ -6,6 +6,7 @@ import {
   CRTOverlay, 
   GlitchText, 
   EffectSettingsPanel,
+  EKGOverlay,
   useEffectSettings 
 } from '../../effects';
 import './Layout.css';
@@ -56,6 +57,9 @@ const Layout: React.FC = () => {
         <Outlet />
       </main>
       
+      {/* EKG/ECG full-screen effect — always on, behind content */}
+      <EKGOverlay enabled={true} />
+
       {/* Global visual effects */}
       <CRTOverlay 
         enabled={settings.crtOverlay.enabled}
