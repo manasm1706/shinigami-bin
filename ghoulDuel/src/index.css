@@ -1,0 +1,45 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --green: #00ff41;
+  --green-dim: #00aa33;
+  --green-dark: #003311;
+  --green-faint: #001a00;
+  --bg: #000;
+  --bg2: #050505;
+  --red: #ff4444;
+  --orange: #ffa500;
+  --cyan: #00ffff;
+  font-family: 'Courier New', monospace;
+  color: var(--green);
+  background: var(--bg);
+}
+
+body {
+  background: #000;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+}
+
+#root {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+button {
+  font-family: 'Courier New', monospace;
+  cursor: pointer;
+}
+
+input {
+  font-family: 'Courier New', monospace;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: #000; }
+::-webkit-scrollbar-thumb { background: var(--green-dark); border-radius: 2px; }

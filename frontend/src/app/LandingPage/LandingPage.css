@@ -319,3 +319,64 @@
   .hero-actions { flex-direction: column; align-items: center; }
   .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
 }
+
+/* ── Arrow-key scroll hint (bottom-right corner) ─────────────────────────── */
+.scroll-hint {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  opacity: 0.45;
+  pointer-events: none;
+  animation: hint-fade 4s ease-in-out 1.5s forwards;
+}
+
+@keyframes hint-fade {
+  0%   { opacity: 0.45; }
+  70%  { opacity: 0.45; }
+  100% { opacity: 0.15; }
+}
+
+.scroll-hint-key {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid #00aa33;
+  color: #00aa33;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  border-radius: 3px;
+  background: rgba(0, 255, 65, 0.05);
+}
+
+.scroll-hint-label {
+  font-family: 'Courier New', monospace;
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: #00aa33;
+}
+
+/* ── Scroll-down nudge below hero CTA ────────────────────────────────────── */
+.scroll-down-nudge {
+  font-family: 'Courier New', monospace;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: #004411;
+  animation: nudge-bounce 2.5s ease-in-out infinite;
+  margin-top: 8px;
+}
+
+@keyframes nudge-bounce {
+  0%, 100% { transform: translateY(0); opacity: 0.5; }
+  50%       { transform: translateY(6px); opacity: 1; }
+}
+
+@media (max-width: 600px) {
+  .scroll-hint { display: none; }
+}

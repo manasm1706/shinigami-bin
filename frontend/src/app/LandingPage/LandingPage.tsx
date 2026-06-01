@@ -20,12 +20,34 @@ const PARTICLES = Array.from({ length: 30 }, (_, i) => ({
   size: Math.random() > 0.7 ? 'large' : 'small',
 }));
 
+// How many pixels each arrow key press scrolls
+const SCROLL_STEP = 120;
+
 const LandingPage: React.FC = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const landingRef = useRef<HTMLDivElement>(null);
 
-  // Animated ASCII rain background
+  // ── Arrow-key scroll (landing page only) ─────────────────────────────────
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't hijack if focus is inside an input/textarea/button
+      const tag = (e.target as HTMLElement).tagName;
+      if (['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON'].includes(tag)) return;
+
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        const dir = e.key === 'ArrowDown' ? 1 : -1;
+        window.scrollBy({ top: dir * SCROLL_STEP, behavior: 'smooth' });
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // ── ASCII rain canvas ─────────────────────────────────────────────────────
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -39,7 +61,7 @@ const LandingPage: React.FC = () => {
     resize();
     window.addEventListener('resize', resize);
 
-    const CHARS = '死神ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()アイウエオカキクケコ';
+    const CHARS = '死神ABCDEFGHIJKLMNOPQRSTUVWXYZアイウエオカキクケコ0123456789@#$%^&*()';
     const fontSize = 14;
     let cols = Math.floor(canvas.width / fontSize);
     const drops: number[] = Array(cols).fill(1);
@@ -47,28 +69,18 @@ const LandingPage: React.FC = () => {
     const draw = () => {
       ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-
       ctx.font = `${fontSize}px Courier New`;
 
       for (let i = 0; i < drops.length; i++) {
         const char = CHARS[Math.floor(Math.random() * CHARS.length)];
         const brightness = Math.random();
-        if (brightness > 0.95) {
-          ctx.fillStyle = '#ffffff';
-        } else if (brightness > 0.7) {
-          ctx.fillStyle = '#00ff41';
-        } else {
-          ctx.fillStyle = 'rgba(0, 180, 40, 0.4)';
-        }
+        if (brightness > 0.95) ctx.fillStyle = '#ffffff';
+        else if (brightness > 0.7) ctx.fillStyle = '#00ff41';
+        else ctx.fillStyle = 'rgba(0, 180, 40, 0.4)';
         ctx.fillText(char, i * fontSize, drops[i] * fontSize);
-
-        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-          drops[i] = 0;
-        }
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
         drops[i]++;
       }
-
-      // Recalculate cols on resize
       cols = Math.floor(canvas.width / fontSize);
       while (drops.length < cols) drops.push(1);
     };
@@ -81,16 +93,19 @@ const LandingPage: React.FC = () => {
   }, []);
 
   const handleEnter = () => {
-    if (isAuthenticated) {
-      navigate('/app/chat');
-    } else {
-      navigate('/login');
-    }
+    navigate(isAuthenticated ? '/app/chat' : '/login');
   };
 
   return (
-    <div className="landing">
+    <div className="landing" ref={landingRef}>
       <canvas ref={canvasRef} className="landing-canvas" />
+
+      {/* Arrow key scroll hint */}
+      <div className="scroll-hint" aria-hidden="true">
+        <span className="scroll-hint-key">↑</span>
+        <span className="scroll-hint-label">SCROLL</span>
+        <span className="scroll-hint-key">↓</span>
+      </div>
 
       {/* Floating particles */}
       <div className="landing-particles">
@@ -109,7 +124,7 @@ const LandingPage: React.FC = () => {
 
       <div className="landing-content">
         {/* Hero */}
-        <div className="landing-hero">
+        <section className="landing-hero" aria-label="Hero">
           <div className="hero-skulls">
             <span className="skull skull-left">💀</span>
             <div className="hero-title-wrap">
@@ -141,10 +156,15 @@ const LandingPage: React.FC = () => {
             <span className="status-dot" />
             SPIRITS ONLINE
           </div>
-        </div>
+
+          {/* Scroll down nudge */}
+          <div className="scroll-down-nudge" aria-hidden="true">
+            <span>▼ SCROLL TO EXPLORE ▼</span>
+          </div>
+        </section>
 
         {/* Features grid */}
-        <div className="features-section">
+        <section className="features-section" aria-label="Capabilities">
           <div className="section-label">// CAPABILITIES</div>
           <div className="features-grid">
             {FEATURES.map(f => (
@@ -155,10 +175,10 @@ const LandingPage: React.FC = () => {
               </div>
             ))}
           </div>
-        </div>
+        </section>
 
         {/* CTA strip */}
-        <div className="landing-cta">
+        <section className="landing-cta" aria-label="Call to action">
           <div className="cta-text">
             "In the realm between worlds, messages echo through eternity..."
           </div>
@@ -167,7 +187,7 @@ const LandingPage: React.FC = () => {
             {isAuthenticated ? 'ENTER THE REALM' : 'BIND YOUR SOUL'}
             <span>💀</span>
           </button>
-        </div>
+        </section>
 
         <footer className="landing-footer">
           <span>死神-BIN</span>
